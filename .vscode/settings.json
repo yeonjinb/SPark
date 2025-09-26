@@ -1,0 +1,4 @@
+{
+  "python.defaultInterpreterPath": "C:\\dev\\SPark\\backend\\venv\\Scripts\\python.exe",
+  "python.languageServer": "Pylance"
+}
