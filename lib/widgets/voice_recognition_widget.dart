@@ -67,13 +67,21 @@ class _VoiceRecognitionWidgetState extends State<VoiceRecognitionWidget>
 
   Future<void> _initializeVosk() async {
     try {
+      print('Vosk 초기화 시작...');
       final success = await VoskService.initialize();
+      print('Vosk 초기화 결과: $success');
       if (mounted) {
         setState(() {
           _isInitialized = success;
         });
+        if (success) {
+          print('Vosk가 성공적으로 초기화되었습니다.');
+        } else {
+          print('Vosk 초기화에 실패했습니다.');
+        }
       }
     } catch (e) {
+      print('Vosk 초기화 중 오류 발생: $e');
       if (mounted) {
         widget.onError?.call('Vosk 초기화 실패: $e');
       }

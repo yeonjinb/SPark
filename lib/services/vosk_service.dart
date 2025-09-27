@@ -12,30 +12,40 @@ class VoskService {
 
   /// Vosk 모델 초기화
   static Future<bool> initialize() async {
-    if (_isInitialized) return true;
+    if (_isInitialized) {
+      print('Vosk가 이미 초기화되어 있습니다.');
+      return true;
+    }
 
     try {
+      print('Vosk 초기화 프로세스 시작...');
+      
       // 마이크 권한 요청
+      print('마이크 권한 요청 중...');
       final micPermission = await Permission.microphone.request();
       if (!micPermission.isGranted) {
         print('마이크 권한이 거부되었습니다.');
         return false;
       }
+      print('마이크 권한이 승인되었습니다.');
 
       // Vosk 모델 경로 설정
+      print('Vosk 모델 경로 확인 중...');
       final modelPath = await _getModelPath();
       if (modelPath == null) {
         print('Vosk 모델을 찾을 수 없습니다.');
         return false;
       }
+      print('Vosk 모델 경로: $modelPath');
 
       // Vosk 초기화
+      print('네이티브 Vosk 초기화 호출 중...');
       final result = await _channel.invokeMethod('initialize', {
         'modelPath': modelPath,
       });
 
       _isInitialized = result == true;
-      print('Vosk 초기화: $_isInitialized');
+      print('Vosk 초기화 결과: $_isInitialized');
       return _isInitialized;
     } catch (e) {
       print('Vosk 초기화 실패: $e');

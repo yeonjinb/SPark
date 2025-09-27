@@ -145,13 +145,49 @@ class _KakaoMapWidgetState extends State<KakaoMapWidget> {
       );
     }
 
-    return KakaoMap(
-      onMapCreated: (KakaoMapController controller) {
-        _mapController = controller;
-        _updateMarkers();
-      },
-      markers: _markers,
-    );
+    try {
+      return KakaoMap(
+        onMapCreated: (KakaoMapController controller) {
+          _mapController = controller;
+          _updateMarkers();
+          print('카카오맵이 성공적으로 생성되었습니다.');
+        },
+        markers: _markers,
+      );
+    } catch (e) {
+      print('카카오맵 생성 오류: $e');
+      return Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.red.withOpacity(0.1),
+              Colors.red.shade50,
+            ],
+          ),
+        ),
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error, size: 48, color: Colors.red),
+              SizedBox(height: 16),
+              Text(
+                '지도 로드 실패',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.red,
+                  fontFamily: 'Inter',
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   // 지도 중심 이동
