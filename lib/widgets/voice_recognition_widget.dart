@@ -275,59 +275,25 @@ class _VoiceRecognitionWidgetState extends State<VoiceRecognitionWidget>
 
           const SizedBox(height: 16),
 
-          // 제어 버튼들
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              if (_isListening)
-                ElevatedButton.icon(
-                  onPressed: _stopListening,
-                  icon: const Icon(Icons.stop, size: 20),
-                  label: const Text('중지'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                  ),
-                )
-              else
-                ElevatedButton.icon(
-                  onPressed: _isInitialized ? _startListening : null,
-                  icon: const Icon(Icons.mic, size: 20),
-                  label: const Text('시작'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                  ),
+          // 인식된 텍스트 지우기 버튼 (필요한 경우에만)
+          if (_recognizedText.isNotEmpty)
+            ElevatedButton.icon(
+              onPressed: () {
+                setState(() {
+                  _recognizedText = '';
+                });
+              },
+              icon: const Icon(Icons.clear, size: 20),
+              label: const Text('텍스트 지우기'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
                 ),
-              
-              if (_recognizedText.isNotEmpty)
-                ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _recognizedText = '';
-                    });
-                  },
-                  icon: const Icon(Icons.clear, size: 20),
-                  label: const Text('지우기'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                  ),
-                ),
-            ],
-          ),
+              ),
+            ),
         ],
       ),
     );
