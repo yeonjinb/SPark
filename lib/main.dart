@@ -33,7 +33,6 @@ void main() async {
   await VoskService.initialize();
   
   // 카카오맵 플러그인 초기화 (AndroidManifest.xml에서 자동으로 처리됨)
-  // KakaoMap.init(nativeAppKey: 'fc9248fb37c47471e8ac96d2336946f2');
   
   runApp(const MyApp());
 }
