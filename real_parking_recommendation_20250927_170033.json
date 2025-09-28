@@ -1,0 +1,493 @@
+{
+  "system_info": {
+    "version": "2.0.0",
+    "data_source": "real_parking_data",
+    "features": [
+      "실제 주차장 데이터",
+      "음성 인식",
+      "자연어 처리",
+      "고급 스코어링",
+      "지도 API 연동",
+      "상세 요금 계산"
+    ],
+    "last_updated": "2025-09-27 17:00:33"
+  },
+  "user_settings": {
+    "current_location": {
+      "latitude": 37.5507,
+      "longitude": 127.0745,
+      "address": "서울특별시 강동구 능동"
+    },
+    "vehicle_info": {
+      "height": 1.8,
+      "type": "승용차",
+      "length": 4.5,
+      "width": 1.8
+    },
+    "preferences": {
+      "price_weight": 0.4,
+      "time_weight": 0.4,
+      "convenience_weight": 0.2,
+      "max_walking_distance": 0.5
+    }
+  },
+  "request_info": {
+    "voice_command": "2시간 주차장 찾아줘",
+    "processed_at": "2025-09-27 17:00:33",
+    "processing_time_ms": 180
+  },
+  "parking_results": {
+    "parsed_command": {
+      "original_text": "2시간 주차장 찾아줘",
+      "time_info": {
+        "hours": 2,
+        "minutes": null,
+        "days": null,
+        "start_time": null,
+        "end_time": null,
+        "duration_type": "hours",
+        "raw_text": "2시간 주차장 찾아줘"
+      },
+      "command_type": "find_parking",
+      "locations": [],
+      "vehicle_types": [],
+      "price_info": {
+        "max_price": null,
+        "price_range": null,
+        "budget": null
+      },
+      "confidence": 0.7
+    },
+    "total_found": 3,
+    "recommendations": [
+      {
+        "id": 2,
+        "name": "능동공영 주차장",
+        "location": {
+          "latitude": 37.5507,
+          "longitude": 127.0745,
+          "address": "능동 205"
+        },
+        "pricing": {
+          "hourly_rate": 3600,
+          "daily_rate": 50000,
+          "night_rate": null,
+          "weekday_base": 1200,
+          "weekday_additional": 200,
+          "weekday_cap": 50000,
+          "weekend_base": 1200,
+          "holiday_base": 1200,
+          "holiday_additional": 200
+        },
+        "capacity": {
+          "total_spaces": 77,
+          "available_spaces": 52
+        },
+        "facilities": [
+          "24시간 운영",
+          "전기차 충전",
+          "지붕 보호"
+        ],
+        "operating_hours": {
+          "weekday": "00:00-23:59",
+          "weekend": "00:00-23:59"
+        },
+        "restrictions": {
+          "max_duration": 24,
+          "vehicle_types": [
+            "승용차",
+            "SUV"
+          ],
+          "height_limit": 2.1
+        },
+        "amenities": {
+          "elevator": false,
+          "restroom": false,
+          "atm": false,
+          "convenience_store": false,
+          "ev_charging": true,
+          "roof": true,
+          "cctv": false,
+          "lighting": false
+        },
+        "rating": 4.1,
+        "reviews_count": 28,
+        "driving_difficulty": {
+          "parking_type": "자주식",
+          "access_road_width": 4.5,
+          "turning_radius": 8.5,
+          "slope_angle": 2,
+          "obstacles": [
+            "없음"
+          ],
+          "lighting": "양호",
+          "security": "우수"
+        },
+        "score_info": {
+          "final_score": 50.95,
+          "cost_score": 6.944,
+          "time_score": 120.0,
+          "convenience_score": 0.86,
+          "total_cost": 1400,
+          "travel_time": 0.0,
+          "difficulty_score": 0.14,
+          "breakdown": {
+            "price_component": 2.778,
+            "time_component": 48.0,
+            "convenience_component": 0.172
+          }
+        },
+        "final_score": 50.95,
+        "total_cost": 1400,
+        "travel_time": 0.0,
+        "difficulty_level": "매우 쉬움",
+        "detailed_pricing": {
+          "base_rate": 3600,
+          "total_hours": 2,
+          "calculation_method": "detailed_pricing",
+          "cost_breakdown": "기본요금: 1,200원 + 추가요금: 200원",
+          "daily_rate_applied": false
+        },
+        "actual_distance_km": 0.0,
+        "actual_travel_time_minutes": 0.0,
+        "map_url": "https://map.kakao.com/link/map/37.5507,127.0745",
+        "route_guidance": {
+          "start_location": {
+            "latitude": 37.5507,
+            "longitude": 127.0745,
+            "address": "서울특별시 강동구 능동"
+          },
+          "end_location": {
+            "latitude": 37.5507,
+            "longitude": 127.0745,
+            "address": "능동 205"
+          },
+          "route_info": {
+            "distance_km": 0.0,
+            "travel_time_minutes": 0.0,
+            "traffic_condition": "보통",
+            "route_type": "최단경로",
+            "api_used": "kakao",
+            "confidence": "low"
+          },
+          "turn_by_turn": [
+            "서울특별시 강동구 능동에서 출발",
+            "주요 도로로 진입",
+            "능동 205 도착"
+          ],
+          "alternative_routes": [
+            {
+              "route_type": "최단경로",
+              "distance_km": 0.0,
+              "travel_time_minutes": 0.0
+            }
+          ],
+          "traffic_alerts": [],
+          "toll_info": {
+            "has_toll": false,
+            "toll_cost": 0
+          }
+        }
+      },
+      {
+        "id": 3,
+        "name": "서울시청 주차장",
+        "location": {
+          "latitude": 37.5665,
+          "longitude": 126.978,
+          "address": "서울특별시 중구 세종대로 110"
+        },
+        "pricing": {
+          "hourly_rate": 1000,
+          "daily_rate": 15000,
+          "night_rate": 500,
+          "weekday_base": 1000,
+          "weekday_additional": 0,
+          "weekday_cap": 15000,
+          "weekend_base": 1000,
+          "holiday_base": 1000,
+          "holiday_additional": 0
+        },
+        "capacity": {
+          "total_spaces": 300,
+          "available_spaces": 15
+        },
+        "facilities": [
+          "24시간 운영",
+          "장애인 주차공간",
+          "전기차 충전시설"
+        ],
+        "operating_hours": {
+          "weekday": "00:00-23:59",
+          "weekend": "00:00-23:59"
+        },
+        "restrictions": {
+          "max_duration": 24,
+          "vehicle_types": [
+            "승용차",
+            "SUV",
+            "승합차"
+          ],
+          "height_limit": 2.1
+        },
+        "amenities": {
+          "elevator": true,
+          "restroom": true,
+          "atm": true,
+          "convenience_store": false,
+          "ev_charging": true,
+          "roof": true,
+          "cctv": true,
+          "lighting": true
+        },
+        "rating": 4.2,
+        "reviews_count": 156,
+        "driving_difficulty": {
+          "parking_type": "자주식",
+          "access_road_width": 4.5,
+          "turning_radius": 8.0,
+          "slope_angle": 5,
+          "obstacles": [
+            "없음"
+          ],
+          "lighting": "우수",
+          "security": "우수"
+        },
+        "score_info": {
+          "final_score": 11.785,
+          "cost_score": 25.0,
+          "time_score": 4.013,
+          "convenience_score": 0.9,
+          "total_cost": 1000,
+          "travel_time": 29.9,
+          "difficulty_score": 0.1,
+          "breakdown": {
+            "price_component": 10.0,
+            "time_component": 1.605,
+            "convenience_component": 0.18
+          }
+        },
+        "final_score": 11.785,
+        "total_cost": 1000,
+        "travel_time": 29.9,
+        "difficulty_level": "매우 쉬움",
+        "detailed_pricing": {
+          "base_rate": 1000,
+          "total_hours": 2,
+          "calculation_method": "detailed_pricing",
+          "cost_breakdown": "기본요금: 1,000원 + 추가요금: 0원",
+          "daily_rate_applied": false
+        },
+        "actual_distance_km": 8.69,
+        "actual_travel_time_minutes": 17.4,
+        "map_url": "https://map.kakao.com/link/map/37.5665,126.978",
+        "route_guidance": {
+          "start_location": {
+            "latitude": 37.5507,
+            "longitude": 127.0745,
+            "address": "서울특별시 강동구 능동"
+          },
+          "end_location": {
+            "latitude": 37.5665,
+            "longitude": 126.978,
+            "address": "서울특별시 중구 세종대로 110"
+          },
+          "route_info": {
+            "distance_km": 8.69,
+            "travel_time_minutes": 17.4,
+            "traffic_condition": "보통",
+            "route_type": "최단경로",
+            "api_used": "kakao",
+            "confidence": "low"
+          },
+          "turn_by_turn": [
+            "서울특별시 강동구 능동에서 출발",
+            "주요 도로로 진입",
+            "서울특별시 중구 세종대로 110 도착"
+          ],
+          "alternative_routes": [
+            {
+              "route_type": "최단경로",
+              "distance_km": 8.69,
+              "travel_time_minutes": 17.4
+            }
+          ],
+          "traffic_alerts": [],
+          "toll_info": {
+            "has_toll": false,
+            "toll_cost": 0
+          }
+        }
+      },
+      {
+        "id": 4,
+        "name": "명동 중앙 주차장",
+        "location": {
+          "latitude": 37.5636,
+          "longitude": 126.9826,
+          "address": "서울특별시 중구 명동길 26"
+        },
+        "pricing": {
+          "hourly_rate": 1500,
+          "daily_rate": 20000,
+          "night_rate": 800,
+          "weekday_base": 1500,
+          "weekday_additional": 0,
+          "weekday_cap": 20000,
+          "weekend_base": 1500,
+          "holiday_base": 1500,
+          "holiday_additional": 0
+        },
+        "capacity": {
+          "total_spaces": 200,
+          "available_spaces": 8
+        },
+        "facilities": [
+          "24시간 운영",
+          "장애인 주차공간",
+          "발렛파킹"
+        ],
+        "operating_hours": {
+          "weekday": "06:00-23:00",
+          "weekend": "08:00-22:00"
+        },
+        "restrictions": {
+          "max_duration": 12,
+          "vehicle_types": [
+            "승용차",
+            "SUV"
+          ],
+          "height_limit": 2.0
+        },
+        "amenities": {
+          "elevator": true,
+          "restroom": true,
+          "atm": true,
+          "convenience_store": false,
+          "ev_charging": false,
+          "roof": true,
+          "cctv": true,
+          "lighting": true
+        },
+        "rating": 4.5,
+        "reviews_count": 89,
+        "driving_difficulty": {
+          "parking_type": "발렛파킹",
+          "access_road_width": 3.0,
+          "turning_radius": 6.0,
+          "slope_angle": 0,
+          "obstacles": [
+            "없음"
+          ],
+          "lighting": "양호",
+          "security": "우수"
+        },
+        "score_info": {
+          "final_score": 8.507,
+          "cost_score": 16.667,
+          "time_score": 4.301,
+          "convenience_score": 0.6,
+          "total_cost": 1500,
+          "travel_time": 27.9,
+          "difficulty_score": 0.4,
+          "breakdown": {
+            "price_component": 6.667,
+            "time_component": 1.72,
+            "convenience_component": 0.12
+          }
+        },
+        "final_score": 8.507,
+        "total_cost": 1500,
+        "travel_time": 27.9,
+        "difficulty_level": "쉬움",
+        "detailed_pricing": {
+          "base_rate": 1500,
+          "total_hours": 2,
+          "calculation_method": "detailed_pricing",
+          "cost_breakdown": "기본요금: 1,500원 + 추가요금: 0원",
+          "daily_rate_applied": false
+        },
+        "actual_distance_km": 8.23,
+        "actual_travel_time_minutes": 16.5,
+        "map_url": "https://map.kakao.com/link/map/37.5636,126.9826",
+        "route_guidance": {
+          "start_location": {
+            "latitude": 37.5507,
+            "longitude": 127.0745,
+            "address": "서울특별시 강동구 능동"
+          },
+          "end_location": {
+            "latitude": 37.5636,
+            "longitude": 126.9826,
+            "address": "서울특별시 중구 명동길 26"
+          },
+          "route_info": {
+            "distance_km": 8.23,
+            "travel_time_minutes": 16.5,
+            "traffic_condition": "보통",
+            "route_type": "최단경로",
+            "api_used": "kakao",
+            "confidence": "low"
+          },
+          "turn_by_turn": [
+            "서울특별시 강동구 능동에서 출발",
+            "주요 도로로 진입",
+            "서울특별시 중구 명동길 26 도착"
+          ],
+          "alternative_routes": [
+            {
+              "route_type": "최단경로",
+              "distance_km": 8.23,
+              "travel_time_minutes": 16.5
+            }
+          ],
+          "traffic_alerts": [],
+          "toll_info": {
+            "has_toll": false,
+            "toll_cost": 0
+          }
+        }
+      }
+    ],
+    "data_source": "real_parking_data",
+    "processing_info": {
+      "vehicle_height_filter": 1.8,
+      "vehicle_type_filter": "승용차",
+      "price_limit_filter": null,
+      "hours_requested": 2
+    }
+  },
+  "summary": {
+    "status": "success",
+    "total_found": 3,
+    "best_recommendation": {
+      "name": "능동공영 주차장",
+      "cost": 1400,
+      "distance": 0.0,
+      "travel_time": 0.0,
+      "score": 50.95,
+      "difficulty": "매우 쉬움"
+    },
+    "price_analysis": {
+      "cheapest": 1000,
+      "most_expensive": 1500,
+      "average": 1300.0,
+      "cost_range": 500
+    },
+    "time_analysis": {
+      "fastest": 0.0,
+      "slowest": 17.4,
+      "average": 11.299999999999999
+    },
+    "amenities_analysis": {
+      "ev_charging": 2,
+      "roof": 3,
+      "elevator": 2
+    },
+    "data_quality": {
+      "source": "real_parking_data",
+      "accuracy": "high",
+      "last_updated": "2024-01-15"
+    }
+  }
+}

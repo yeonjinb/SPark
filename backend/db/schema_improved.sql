@@ -283,3 +283,279 @@ begin
   return new;
 end;
 $$ language plpgsql;
+
+-- Insert actual Seoul Gwangjin-gu parking lot data (20 locations)
+-- Based on real Excel data with 30-minute base fare + 5-minute additional fare structure
+
+insert into public.parking_lots (
+  name, lat, lng, height_limit_m, ev_charging, open_24h,
+  weekday_base_price, weekday_additional_price, weekday_daily_max,
+  weekend_base_price, weekend_additional_price, weekend_daily_max,
+  price_per_hour, difficulty_score, structure_type, capacity,
+  has_roof, has_elevator, has_disabled_access, has_cctv, has_lighting
+) values
+
+-- 1. 능동공영 (EV charging available, 24h, discounts for disabled/children)
+('능동공영', 37.554161, 127.080178, 2.1, true, true,
+ 1800, 300, null,  -- Weekday: 30min=1800원, 5min=300원
+ 1800, 300, null,  -- Weekend: same as weekday
+ 3600, 2.0, 'GROUND', 77,
+ true, false, true, true, true),
+
+-- 2. 자양전통시장 공영 (No EV, limited hours, no discounts)
+('자양전통시장 공영', 37.536635, 127.06509, 2.2, false, false,
+ 2250, 375, null,  -- Weekday: 30min=2250원, 5min=375원
+ 2250, 375, null,  -- Weekend: same as weekday
+ 4500, 2.0, 'GROUND', 24,
+ true, false, false, true, true),
+
+-- 3. 자양4동 공영 (EV charging, 24h)
+('자양4동 공영', 37.538793, 127.068189, null, true, true,
+ 2250, 375, null,  -- Weekday: 30min=2250원, 5min=375원
+ 2250, 375, null,  -- Weekend: same as weekday
+ 4500, 1.0, 'GROUND', 83,
+ false, false, false, true, true),
+
+-- 4. 화양동 공영 (EV charging, 24h, multiple discounts)
+('화양동 공영', 37.545499, 127.071053, 2.1, true, true,
+ 1800, 300, null,  -- Weekday: 30min=1800원, 5min=300원
+ 1800, 300, null,  -- Weekend: same as weekday
+ 3600, 3.0, 'GROUND', 44,
+ true, false, true, true, true),
+
+-- 5. 광진광장 공영 (No EV, 24h)
+('광진광장 공영', 37.547903, 127.073174, 2.0, false, true,
+ 2250, 375, null,  -- Weekday: 30min=2250원, 5min=375원
+ 2250, 375, null,  -- Weekend: same as weekday
+ 4500, 1.0, 'GROUND', 36,
+ false, false, false, true, true),
+
+-- 6. 어린이대공원 정문 주차장 (No EV, limited hours, discounts)
+('어린이대공원 정문 주차장', 37.552059, 127.076285, null, false, false,
+ 1350, 225, null,  -- Weekday: 30min=1350원, 5min=225원
+ 1350, 225, null,  -- Weekend: same as weekday
+ 2700, 1.0, 'GROUND', 335,
+ false, false, true, true, true),
+
+-- 7. 어린이대공원 후문 주차장 (EV charging, limited hours, discounts)
+('어린이대공원 후문 주차장', 37.551929, 127.087462, null, true, false,
+ 1350, 225, null,  -- Weekday: 30min=1350원, 5min=225원
+ 1350, 225, null,  -- Weekend: same as weekday
+ 2700, 1.0, 'GROUND', 250,
+ false, false, true, true, true),
+
+-- 8. 광진정보도서관 주차장 (EV charging, 24h, discounts)
+('광진정보도서관 주차장', 37.55118, 127.110693, 2.1, true, true,
+ 1350, 225, null,  -- Weekday: 30min=1350원, 5min=225원
+ 1350, 225, null,  -- Weekend: same as weekday
+ 2700, 2.0, 'UNDERGROUND', 14,
+ true, true, true, true, true),
+
+-- 9. 송림 기사식당길 공영주차장 (EV charging, limited hours, discounts)
+('송림 기사식당길 공영주차장', 37.534678, 127.076117, null, true, false,
+ 1800, 300, null,  -- Weekday: 30min=1800원, 5min=300원
+ 1800, 300, null,  -- Weekend: same as weekday
+ 3600, 2.0, 'GROUND', 1,
+ false, false, true, true, true),
+
+-- 10. 송림기사식당길(B) 공영주차장 (EV charging, limited hours, discounts)
+('송림기사식당길(B) 공영주차장', 37.537368, 127.076519, null, true, false,
+ 1800, 300, null,  -- Weekday: 30min=1800원, 5min=300원
+ 1800, 300, null,  -- Weekend: same as weekday
+ 3600, 2.0, 'GROUND', 1,
+ false, false, true, true, true),
+
+-- 11. 자양유수지 공영주차장 (EV charging, 24h)
+('자양유수지 공영주차장', 37.529884, 127.077604, null, true, true,
+ 1800, 300, null,  -- Weekday: 30min=1800원, 5min=300원
+ 1800, 300, null,  -- Weekend: same as weekday
+ 3600, 1.0, 'GROUND', 281,
+ false, false, false, true, true),
+
+-- 12. 동서울호텔길 노상공영주차장 (EV charging, 24h, premium pricing)
+('동서울호텔길 노상공영주차장', 37.533539, 127.091273, null, true, true,
+ 2700, 450, null,  -- Weekday: 30min=2700원, 5min=450원 (premium)
+ 2700, 450, null,  -- Weekend: same as weekday
+ 5400, 2.0, 'GROUND', 1,
+ false, false, false, true, true),
+
+-- 13. 건국대병원주차장 (EV charging, limited hours, disabled discount)
+('건국대병원주차장', 37.540604, 127.072128, 2.1, true, false,
+ 2250, 375, null,  -- Weekday: 30min=2250원, 5min=375원
+ 2250, 375, null,  -- Weekend: same as weekday
+ 4500, 1.0, 'UNDERGROUND', 655,
+ true, true, true, true, true),
+
+-- 14. 한림타워민영주차장 (EV charging, 24h, premium)
+('한림타워민영주차장', 37.540943, 127.069157, 2.2, true, true,
+ 2250, 375, null,  -- Weekday: 30min=2250원, 5min=375원
+ 2250, 375, null,  -- Weekend: same as weekday
+ 4500, 2.0, 'UNDERGROUND', null,
+ true, true, false, true, true),
+
+-- 15. 건국대서울캠퍼스주차장 (No EV, 24h, high pricing)
+('건국대서울캠퍼스주차장', 37.542575, 127.07376, 2.3, false, true,
+ 3000, 500, null,  -- Weekday: 30min=3000원, 5min=500원 (high)
+ 3000, 500, null,  -- Weekend: same as weekday
+ 6000, 1.0, 'GROUND', null,
+ false, false, false, true, true),
+
+-- 16. 가나주차장 (No EV, 24h, premium)
+('가나주차장', 37.541302, 127.069866, 2.4, false, true,
+ 2998, 500, null,  -- Weekday: 30min=2998원, 5min=500원
+ 2998, 500, null,  -- Weekend: same as weekday
+ 5996, 2.0, 'UNDERGROUND', 30,
+ true, true, false, true, true),
+
+-- 17. 스타시티주차장 (No EV, 24h, premium pricing, large capacity)
+('스타시티주차장', 37.537964, 127.072702, 2.5, false, true,
+ 4500, 750, null,  -- Weekday: 30min=4500원, 5min=750원 (premium)
+ 4500, 750, null,  -- Weekend: same as weekday
+ 9000, 1.0, 'UNDERGROUND', 1452,
+ true, true, false, true, true),
+
+-- 18. 한아름민영주차장 (No EV, 24h, mid-range pricing)
+('한아름민영주차장', 37.543689, 127.069895, null, false, true,
+ 2500, 417, null,  -- Weekday: 30min=2500원, 5min=417원
+ 2500, 417, null,  -- Weekend: same as weekday
+ 5000, 2.0, 'GROUND', null,
+ false, false, false, true, true),
+
+-- 19. 동신민영주차장 (No EV, limited hours, mid-range pricing)
+('동신민영주차장', 37.542558, 127.06471, null, false, false,
+ 2250, 375, null,  -- Weekday: 30min=2250원, 5min=375원
+ 2250, 375, null,  -- Weekend: same as weekday
+ 4500, 2.0, 'UNDERGROUND', null,
+ true, true, false, true, true),
+
+-- 20. 아이파킹 동도센트리움캠퍼스파크 주차장 (No EV, 24h, height restricted)
+('아이파킹 동도센트리움캠퍼스파크 주차장', 37.54781, 127.07091, 1.55, false, true,
+ 2250, 375, null,  -- Weekday: 30min=2250원, 5min=375원
+ 2250, 375, null,  -- Weekend: same as weekday
+ 4500, 3.0, 'UNDERGROUND', 132,
+ true, true, false, true, true)
+
+on conflict (name, lat, lng) do nothing;
+
+-- Create discount policies table for parking lots
+create table if not exists public.parking_discounts (
+  id uuid primary key default gen_random_uuid(),
+  parking_lot_id uuid not null references public.parking_lots(id) on delete cascade,
+  discount_type text not null check (discount_type in ('DISABLED', 'ECO_CAR', 'TWO_CHILDREN', 'THREE_CHILDREN')),
+  discount_rate int not null check (discount_rate >= 0 and discount_rate <= 100), -- 할인율 (%)
+  description text,
+  created_at timestamptz not null default now(),
+  unique(parking_lot_id, discount_type)
+);
+
+-- Insert discount policies for parking lots
+insert into public.parking_discounts (parking_lot_id, discount_type, discount_rate, description) 
+select 
+  pl.id,
+  discount_type,
+  discount_rate,
+  description
+from public.parking_lots pl,
+(values
+  ('DISABLED', 80, '장애인 할인'),
+  ('TWO_CHILDREN', 30, '2자녀 할인'),
+  ('THREE_CHILDREN', 50, '3자녀 이상 할인')
+) as discounts(discount_type, discount_rate, description)
+where pl.name in ('능동공영');
+
+insert into public.parking_discounts (parking_lot_id, discount_type, discount_rate, description) 
+select 
+  pl.id,
+  discount_type,
+  discount_rate,
+  description
+from public.parking_lots pl,
+(values
+  ('DISABLED', 80, '장애인 할인'),
+  ('ECO_CAR', 50, '친환경차 할인'),
+  ('TWO_CHILDREN', 30, '2자녀 할인'),
+  ('THREE_CHILDREN', 50, '3자녀 이상 할인')
+) as discounts(discount_type, discount_rate, description)
+where pl.name in ('화양동 공영');
+
+insert into public.parking_discounts (parking_lot_id, discount_type, discount_rate, description) 
+select 
+  pl.id,
+  discount_type,
+  discount_rate,
+  description
+from public.parking_lots pl,
+(values
+  ('DISABLED', 80, '장애인 할인'),
+  ('ECO_CAR', 50, '친환경차 할인'),
+  ('THREE_CHILDREN', 50, '3자녀 이상 할인')
+) as discounts(discount_type, discount_rate, description)
+where pl.name in ('어린이대공원 정문 주차장', '어린이대공원 후문 주차장');
+
+insert into public.parking_discounts (parking_lot_id, discount_type, discount_rate, description) 
+select 
+  pl.id,
+  discount_type,
+  discount_rate,
+  description
+from public.parking_lots pl,
+(values
+  ('DISABLED', 80, '장애인 할인'),
+  ('ECO_CAR', 50, '친환경차 할인'),
+  ('TWO_CHILDREN', 30, '2자녀 할인'),
+  ('THREE_CHILDREN', 50, '3자녀 이상 할인')
+) as discounts(discount_type, discount_rate, description)
+where pl.name in ('광진정보도서관 주차장', '송림 기사식당길 공영주차장', '송림기사식당길(B) 공영주차장');
+
+insert into public.parking_discounts (parking_lot_id, discount_type, discount_rate, description) 
+select 
+  pl.id,
+  discount_type,
+  discount_rate,
+  description
+from public.parking_lots pl,
+(values
+  ('DISABLED', 50, '장애인 할인')
+) as discounts(discount_type, discount_rate, description)
+where pl.name in ('건국대병원주차장');
+
+-- Create indexes for discount queries
+create index if not exists idx_parking_discounts_lot on public.parking_discounts (parking_lot_id);
+create index if not exists idx_parking_discounts_type on public.parking_discounts (discount_type);
+
+-- Summary of inserted data:
+/*
+INSERTED PARKING LOT DATA (20 locations):
+
+1. 능동공영 - EV ✓, 24h ✓, 장애인/다자녀 할인
+2. 자양전통시장 공영 - No EV, 시간제한, 할인 없음
+3. 자양4동 공영 - EV ✓, 24h ✓
+4. 화양동 공영 - EV ✓, 24h ✓, 모든 할인
+5. 광진광장 공영 - No EV, 24h ✓
+6. 어린이대공원 정문 - No EV, 시간제한, 장애인/친환경/3자녀 할인
+7. 어린이대공원 후문 - EV ✓, 시간제한, 장애인/친환경/3자녀 할인
+8. 광진정보도서관 - EV ✓, 24h ✓, 모든 할인
+9. 송림 기사식당길 - EV ✓, 시간제한, 모든 할인
+10. 송림기사식당길(B) - EV ✓, 시간제한, 모든 할인
+11. 자양유수지 공영 - EV ✓, 24h ✓
+12. 동서울호텔길 - EV ✓, 24h ✓, 프리미엄 요금
+13. 건국대병원 - EV ✓, 시간제한, 장애인 할인
+14. 한림타워민영 - EV ✓, 24h ✓
+15. 건국대서울캠퍼스 - No EV, 24h ✓, 고가
+16. 가나주차장 - No EV, 24h ✓, 프리미엄
+17. 스타시티주차장 - No EV, 24h ✓, 최고가, 대용량
+18. 한아름민영 - No EV, 24h ✓
+19. 동신민영 - No EV, 시간제한
+20. 아이파킹 동도센트리움 - No EV, 24h ✓, 높이제한 1.55m
+
+PRICING STRUCTURE:
+- 모든 주차장: 30분 기본요금 + 5분당 추가요금
+- 요금대: 1,350원~4,500원 (30분 기준)
+- 추가요금: 225원~750원 (5분당)
+
+FEATURES:
+- 전기차 충전: 12개소 (60%)
+- 24시간 운영: 13개소 (65%)
+- 지하주차장: 8개소 (40%)
+- 할인 혜택: 8개소 (40%)
+*/

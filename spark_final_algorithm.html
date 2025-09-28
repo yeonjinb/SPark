@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPARK - Final Algorithm Version</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --accent-color: #FF5722;
+            --success-color: #8BC34A;
+            --warning-color: #FF9800;
+            --error-color: #F44336;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --background: #FAFAFA;
+            --surface: #FFFFFF;
+            --border: #E0E0E0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            min-height: 100vh;
+        }
+
+        .panel {
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+            color: white;
+            padding: 24px;
+            text-align: center;
+            position: relative;
+        }
+
+        .panel-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .panel-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .login-indicator {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-indicator:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .panel-content {
+            padding: 32px;
+        }
+
+        .user-status {
+            background: linear-gradient(135deg, #E8F5E8, #F1F8E9);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--success-color);
+        }
+
+        .user-status.guest {
+            background: linear-gradient(135deg, #FFF8E1, #FFFDE7);
+            border-color: var(--warning-color);
+        }
+
+        .user-type-selector {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 2px solid var(--secondary-color);
+        }
+
+        .user-type-selector h3 {
+            color: var(--secondary-color);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .preference-types {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .preference-type {
+            background: var(--background);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .preference-type:hover {
+            border-color: var(--secondary-color);
+            background: #E3F2FD;
+        }
+
+        .preference-type.selected {
+            border-color: var(--secondary-color);
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .preference-type .type-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .preference-type .type-desc {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .algorithm-display {
+            background: #E8F5E8;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-top: 12px;
+        }
+
+        .voice-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .voice-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(76, 175, 80, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .voice-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 48px rgba(76, 175, 80, 0.4);
+        }
+
+        .voice-button.recording {
+            background: linear-gradient(45deg, var(--error-color), #E91E63);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .status-card {
+            background: var(--background);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .status-card.listening {
+            border-left-color: var(--warning-color);
+            background: #FFF8E1;
+        }
+
+        .status-card.error {
+            border-left-color: var(--error-color);
+            background: #FFEBEE;
+        }
+
+        .status-card.success {
+            border-left-color: var(--success-color);
+            background: #E8F5E8;
+        }
+
+        .recognition-result {
+            background: linear-gradient(135deg, #E3F2FD, #F3E5F5);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            border: 1px solid var(--secondary-color);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        .quick-btn {
+            background: linear-gradient(135deg, var(--background), #F5F5F5);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .quick-btn:hover {
+            background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(76, 175, 80, 0.3);
+        }
+
+        .recommendations {
+            margin-top: 24px;
+        }
+
+        .recommendations h3 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .parking-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .parking-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+        }
+
+        .parking-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+
+        .parking-card.alpha::before { background: #FFD700; }
+        .parking-card.beta::before { background: var(--secondary-color); }
+        .parking-card.gamma::before { background: var(--success-color); }
+
+        .parking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .parking-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .score-display {
+            background: rgba(33, 150, 243, 0.1);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .parking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .navigate-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 16px;
+            font-size: 1rem;
+        }
+
+        .navigate-btn:hover {
+            background: linear-gradient(135deg, var(--success-color), var(--primary-color));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+        }
+
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .preference-types {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 16px;
+            }
+            
+            .panel-content {
+                padding: 24px;
+            }
+            
+            .voice-button {
+                width: 100px;
+                height: 100px;
+                font-size: 2rem;
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Panel: Voice Recognition & Controls -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="login-indicator" id="loginIndicator" onclick="toggleUserMode()">
+                    👤 게스트 모드
+                </div>
+                <h1>🚗 SPARK</h1>
+                <p>AI 가중치 기반 스마트 주차 추천</p>
+            </div>
+            
+            <div class="panel-content">
+                <!-- Vehicle Information (Member Only) -->
+                <div class="user-type-selector" id="vehicleInfoSelector" style="display: none;">
+                    <h3>🚗 차량 정보 설정</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="font-weight: bold; margin-bottom: 8px; display: block;">차량 타입:</label>
+                            <select id="vehicleType" onchange="updateVehicleInfo()" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+                                <option value="sedan">일반 승용차</option>
+                                <option value="suv">SUV</option>
+                                <option value="electric">전기차</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-weight: bold; margin-bottom: 8px; display: block;">차량 높이:</label>
+                            <select id="vehicleHeight" onchange="updateVehicleInfo()" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+                                <option value="1.5">1.5m 이하</option>
+                                <option value="2.0">2.0m 이하</option>
+                                <option value="2.5">2.5m 이하</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="font-weight: bold; margin-bottom: 8px; display: block;">할인 혜택:</label>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <label><input type="checkbox" id="hasDisability" onchange="updateVehicleInfo()"> 장애인 할인</label>
+                                <label><input type="checkbox" id="hasEcoCar" onchange="updateVehicleInfo()"> 친환경차 할인</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-weight: bold; margin-bottom: 8px; display: block;">자녀 수:</label>
+                            <select id="childrenCount" onchange="updateVehicleInfo()" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+                                <option value="0">없음</option>
+                                <option value="2">2명</option>
+                                <option value="3">3명 이상</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Preference Selector (Member Only) -->
+                <div class="user-type-selector" id="preferenceSelector" style="display: none;">
+                    <h3>🎯 선호도 유형 선택</h3>
+                    <div class="preference-types">
+                        <div class="preference-type" data-type="alpha" onclick="selectPreference('alpha')">
+                            <div class="type-name">α형 (가격민감)</div>
+                            <div class="type-desc">저렴한 주차장 우선</div>
+                        </div>
+                        <div class="preference-type" data-type="beta" onclick="selectPreference('beta')">
+                            <div class="type-name">β형 (시간민감)</div>
+                            <div class="type-desc">빠른 도착 우선</div>
+                        </div>
+                        <div class="preference-type" data-type="gamma" onclick="selectPreference('gamma')">
+                            <div class="type-name">γ형 (편의민감)</div>
+                            <div class="type-desc">편리한 주차 우선</div>
+                        </div>
+                    </div>
+                    <div class="algorithm-display" id="algorithmDisplay">
+                        Score = α×(1/총요금) + β×(1/예상시간) + γ×(4-난이도)
+                    </div>
+                </div>
+
+                <!-- User Status Section -->
+                <div class="user-status" id="userStatus">
+                    <h3 id="userStatusTitle">🌟 게스트 사용자</h3>
+                    <div id="userStatusContent">
+                        📍 최단거리 + 최저가 기준 추천<br>
+                        🚗 일반 승용차 가정<br>
+                        ⚠️ 개인 할인 혜택 없음
+                    </div>
+                </div>
+
+                <!-- Voice Recognition Section -->
+                <div class="voice-section">
+                    <button class="voice-button" id="voiceBtn">🎤</button>
+                    
+                    <div class="status-card" id="statusCard">
+                        <div id="statusText">Ready for voice command</div>
+                    </div>
+                    
+                    <div id="recognitionResult" class="recognition-result" style="display: none;">
+                        <strong>인식된 명령:</strong> <span id="recognizedText"></span>
+                    </div>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="quickSearch(1)">
+                        🕐<br><span>1시간</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickSearch(2)">
+                        🕑<br><span>2시간</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickSearchEV(2)">
+                        🔌<br><span>전기차<br>2시간</span>
+                    </button>
+                    <button class="quick-btn" onclick="quickSearch(8)">
+                        🕘<br><span>하루종일</span>
+                    </button>
+                </div>
+
+                <!-- Recommendations Section -->
+                <div id="recommendationsSection" class="recommendations" style="display: none;">
+                    <h3 id="recommendationTitle">🎯 AI 추천 주차장</h3>
+                    <div id="parkingList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Algorithm & Info -->
+        <div class="panel">
+            <div class="panel-content">
+                <!-- Current Algorithm Display -->
+                <div class="user-status">
+                    <h3>🧠 현재 적용 알고리즘</h3>
+                    <div id="currentAlgorithm">
+                        <div style="font-family: 'Courier New', monospace; background: #f0f0f0; padding: 12px; border-radius: 8px; margin: 12px 0;">
+                            Score = 0.5×거리점수 + 0.5×가격점수
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            게스트 모드: 간단한 거리+가격 기준
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Conditions -->
+                <div class="user-status" id="searchConditionsPanel">
+                    <h3>📋 검색 조건</h3>
+                    <div id="searchConditions">
+                        <div class="detail-item">
+                            <span class="detail-icon">🚗</span>
+                            <span id="vehicleCondition">차량: 일반 승용차 (1.5m 이하)</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📍</span>
+                            <span>위치: 광진구 중앙</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🎯</span>
+                            <span id="criteriaCondition">기준: 거리 + 가격 최적화</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">💳</span>
+                            <span id="discountCondition">할인: 적용 없음 (게스트)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Algorithm Explanation -->
+                <div style="background: #E3F2FD; padding: 20px; border-radius: 12px; border-left: 4px solid var(--secondary-color); margin: 20px 0;">
+                    <h4 style="color: var(--secondary-color); margin-bottom: 12px;">🔬 알고리즘 상세</h4>
+                    <div id="algorithmExplanation">
+                        <div style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);">
+                            <strong>게스트 모드:</strong> 거리와 가격만을 고려한 단순 추천<br>
+                            • 거리 점수: (1 - 거리/1000m)<br>
+                            • 가격 점수: (1 - 요금/10000원)<br>
+                            • 최종 점수: 거리×0.5 + 가격×0.5
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Score Breakdown Display -->
+                <div id="scoreBreakdown" style="display: none; background: #F1F8E9; padding: 20px; border-radius: 12px; border-left: 4px solid var(--success-color); margin: 20px 0;">
+                    <h4 style="color: var(--success-color); margin-bottom: 12px;">📊 점수 상세 분석</h4>
+                    <div id="scoreDetails"></div>
+                </div>
+
+                <!-- Kakao Map Container -->
+                <div id="map" style="width: 500px;height: 400px; border-radius: 12px; margin: 20px 0;"></div>
+                
+                <!-- Location Status -->
+                <div id="locationStatus" style="margin: 10px 0;"></div>
+                
+                <!-- Location Control Buttons -->
+                <div style="display: flex; gap: 10px; margin: 10px 0;">
+                    <button onclick="getCurrentLocation()" 
+                            style="flex: 1; padding: 10px; background: #007bff; color: white; 
+                                   border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
+                        📍 현재 위치
+                    </button>
+                    <button onclick="initializeKakaoMap()" 
+                            style="flex: 1; padding: 10px; background: #28a745; color: white; 
+                                   border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
+                        🗺️ 지도 초기화
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 카카오맵 API -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2f6c4e6c906b95514bf1690a4efc328b"></script>
+    
+    <script>
+        // 전역 변수
+        let map = null;
+        let userMarker = null;
+        let parkingMarkers = [];
+        let currentUserLocation = null;
+
+        // 실제 서울 광진구 주차장 20개 데이터 (엑셀에서 추출)
+        const parkingDatabase = [
+            {
+                id: 1,
+                name: "능동공영",
+                lat: 37.554161,
+                lng: 127.080178,
+                address: "능동 205",
+                height_limit_m: "2.1 M",
+                ev_charging: true,
+                open_24h: true,
+                base_fare_30min: 1800,  // 30분 기본요금
+                additional_fare_5min: 300,  // 5분당 추가요금
+                price_per_hour: 3600,  // 참고용 (계산된 값)
+                capacity: 77,
+                difficulty_score: 2,
+                has_roof: true,
+                disabled_discount_rate: 80,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: 30,
+                three_child_discount_rate: 50,
+                is_public_parking: true
+            },
+            {
+                id: 2,
+                name: "자양전통시장 공영",
+                lat: 37.536635,
+                lng: 127.06509,
+                address: "자양1동 631-18",
+                height_limit_m: "2.2 M",
+                ev_charging: false,
+                open_24h: false,
+                base_fare_30min: 2250,
+                additional_fare_5min: 375,
+                price_per_hour: 4500,
+                capacity: 24,
+                difficulty_score: 2,
+                has_roof: true,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: true
+            },
+            {
+                id: 3,
+                name: "자양4동 공영",
+                lat: 37.538793,
+                lng: 127.068189,
+                address: "자양4동 5-5",
+                height_limit_m: null,
+                ev_charging: true,
+                open_24h: true,
+                base_fare_30min: 2250,
+                additional_fare_5min: 375,
+                price_per_hour: 4500,
+                capacity: 83,
+                difficulty_score: 1,
+                has_roof: false,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: true
+            },
+            {
+                id: 4,
+                name: "화양동 공영",
+                lat: 37.545499,
+                lng: 127.071053,
+                address: "화양동 63-2",
+                height_limit_m: "2.1M",
+                ev_charging: true,
+                open_24h: true,
+                base_fare_30min: 1800,
+                additional_fare_5min: 300,
+                price_per_hour: 3600,
+                capacity: 44,
+                difficulty_score: 3,
+                has_roof: true,
+                disabled_discount_rate: 80,
+                eco_car_discount_rate: 50,
+                two_child_discount_rate: 30,
+                three_child_discount_rate: 50,
+                is_public_parking: true
+            },
+            {
+                id: 5,
+                name: "광진광장 공영",
+                lat: 37.547903,
+                lng: 127.073174,
+                address: "군자동 374",
+                height_limit_m: "2M",
+                ev_charging: false,
+                open_24h: true,
+                base_fare_30min: 2250,
+                additional_fare_5min: 375,
+                price_per_hour: 4500,
+                capacity: 36,
+                difficulty_score: 1,
+                has_roof: false,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: true
+            },
+            {
+                id: 6,
+                name: "어린이대공원 정문 주차장",
+                lat: 37.552059,
+                lng: 127.076285,
+                address: "서울 광진구 능동 18",
+                height_limit_m: null,
+                ev_charging: false,
+                open_24h: false,
+                base_fare_30min: 1350,
+                additional_fare_5min: 225,
+                price_per_hour: 2700,
+                capacity: 335,
+                difficulty_score: 1,
+                has_roof: false,
+                disabled_discount_rate: 80,
+                eco_car_discount_rate: 50,
+                two_child_discount_rate: null,
+                three_child_discount_rate: 50,
+                is_public_parking: false
+            },
+            {
+                id: 7,
+                name: "어린이대공원 후문 주차장",
+                lat: 37.551929,
+                lng: 127.087462,
+                address: "서울 광진구 능동",
+                height_limit_m: null,
+                ev_charging: true,
+                open_24h: false,
+                base_fare_30min: 1350,
+                additional_fare_5min: 225,
+                price_per_hour: 2700,
+                capacity: 250,
+                difficulty_score: 1,
+                has_roof: false,
+                disabled_discount_rate: 80,
+                eco_car_discount_rate: 50,
+                two_child_discount_rate: null,
+                three_child_discount_rate: 50,
+                is_public_parking: false
+            },
+            {
+                id: 8,
+                name: "광진정보도서관 주차장",
+                lat: 37.55118,
+                lng: 127.110693,
+                address: "서울 광진구 광장동 112",
+                height_limit_m: "2.1M",
+                ev_charging: true,
+                open_24h: true,
+                base_fare_30min: 1350,
+                additional_fare_5min: 225,
+                price_per_hour: 2700,
+                capacity: 14,
+                difficulty_score: 2,
+                has_roof: true,
+                disabled_discount_rate: 80,
+                eco_car_discount_rate: 50,
+                two_child_discount_rate: 30,
+                three_child_discount_rate: 50,
+                is_public_parking: false
+            },
+            {
+                id: 9,
+                name: "송림 기사식당길 공영주차장",
+                lat: 37.534678,
+                lng: 127.076117,
+                address: "자양동 227-1",
+                height_limit_m: null,
+                ev_charging: true,
+                open_24h: false,
+                base_fare_30min: 1800,
+                additional_fare_5min: 300,
+                price_per_hour: 3600,
+                capacity: 1,
+                difficulty_score: 2,
+                has_roof: false,
+                disabled_discount_rate: 80,
+                eco_car_discount_rate: 50,
+                two_child_discount_rate: 30,
+                three_child_discount_rate: 50,
+                is_public_parking: true
+            },
+            {
+                id: 10,
+                name: "송림기사식당길(B) 공영주차장",
+                lat: 37.537368,
+                lng: 127.076519,
+                address: "자양동 227-131",
+                height_limit_m: null,
+                ev_charging: true,
+                open_24h: false,
+                base_fare_30min: 1800,
+                additional_fare_5min: 300,
+                price_per_hour: 3600,
+                capacity: 1,
+                difficulty_score: 2,
+                has_roof: false,
+                disabled_discount_rate: 80,
+                eco_car_discount_rate: 50,
+                two_child_discount_rate: 30,
+                three_child_discount_rate: 50,
+                is_public_parking: true
+            },
+            {
+                id: 11,
+                name: "자양유수지 공영주차장",
+                lat: 37.529884,
+                lng: 127.077604,
+                address: "자양동 594-0",
+                height_limit_m: null,
+                ev_charging: true,
+                open_24h: true,
+                base_fare_30min: 1800,
+                additional_fare_5min: 300,
+                price_per_hour: 3600,
+                capacity: 281,
+                difficulty_score: 1,
+                has_roof: false,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: true
+            },
+            {
+                id: 12,
+                name: "동서울호텔길 노상공영주차장",
+                lat: 37.533539,
+                lng: 127.091273,
+                address: "자양동 609-1",
+                height_limit_m: null,
+                ev_charging: true,
+                open_24h: true,
+                base_fare_30min: 2700,
+                additional_fare_5min: 450,
+                price_per_hour: 5400,
+                capacity: 1,
+                difficulty_score: 2,
+                has_roof: false,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: true
+            },
+            {
+                id: 13,
+                name: "건국대병원주차장",
+                lat: 37.540604,
+                lng: 127.072128,
+                address: "화양동4-12",
+                height_limit_m: "2.1M",
+                ev_charging: true,
+                open_24h: false,
+                base_fare_30min: 2250,
+                additional_fare_5min: 375,
+                price_per_hour: 4500,
+                capacity: 655,
+                difficulty_score: 1,
+                has_roof: true,
+                disabled_discount_rate: 50,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: false
+            },
+            {
+                id: 14,
+                name: "한림타워민영주차장",
+                lat: 37.540943,
+                lng: 127.069157,
+                address: "화양동7-3",
+                height_limit_m: "2.2M",
+                ev_charging: true,
+                open_24h: true,
+                base_fare_30min: 2250,
+                additional_fare_5min: 375,
+                price_per_hour: 4500,
+                capacity: null,
+                difficulty_score: 2,
+                has_roof: true,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: false
+            },
+            {
+                id: 15,
+                name: "건국대서울캠퍼스주차장",
+                lat: 37.542575,
+                lng: 127.07376,
+                address: "화양동1",
+                height_limit_m: "2.3M",
+                ev_charging: false,
+                open_24h: true,
+                base_fare_30min: 3000,
+                additional_fare_5min: 500,
+                price_per_hour: 6000,
+                capacity: null,
+                difficulty_score: 1,
+                has_roof: false,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: false
+            },
+            {
+                id: 16,
+                name: "가나주차장",
+                lat: 37.541302,
+                lng: 127.069866,
+                address: "화양동8-27",
+                height_limit_m: "2.4M",
+                ev_charging: false,
+                open_24h: true,
+                base_fare_30min: 2998,
+                additional_fare_5min: 500,
+                price_per_hour: 5996,
+                capacity: 30,
+                difficulty_score: 2,
+                has_roof: true,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: false
+            },
+            {
+                id: 17,
+                name: "스타시티주차장",
+                lat: 37.537964,
+                lng: 127.072702,
+                address: "자양동227-7",
+                height_limit_m: "2.5M",
+                ev_charging: false,
+                open_24h: true,
+                base_fare_30min: 4500,
+                additional_fare_5min: 750,
+                price_per_hour: 9000,
+                capacity: 1452,
+                difficulty_score: 1,
+                has_roof: true,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: false
+            },
+            {
+                id: 18,
+                name: "한아름민영주차장",
+                lat: 37.543689,
+                lng: 127.069895,
+                address: "화양동10-1",
+                height_limit_m: null,
+                ev_charging: false,
+                open_24h: true,
+                base_fare_30min: 2500,
+                additional_fare_5min: 417,
+                price_per_hour: 5000,
+                capacity: null,
+                difficulty_score: 2,
+                has_roof: false,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: false
+            },
+            {
+                id: 19,
+                name: "동신민영주차장",
+                lat: 37.542558,
+                lng: 127.06471,
+                address: "화양동 50-1",
+                height_limit_m: null,
+                ev_charging: false,
+                open_24h: false,
+                base_fare_30min: 2250,
+                additional_fare_5min: 375,
+                price_per_hour: 4500,
+                capacity: null,
+                difficulty_score: 2,
+                has_roof: true,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: false
+            },
+            {
+                id: 20,
+                name: "아이파킹 동도센트리움캠퍼스파크 주차장",
+                lat: 37.54781,
+                lng: 127.07091,
+                address: "화양동 116-2",
+                height_limit_m: "1.55M",
+                ev_charging: false,
+                open_24h: true,
+                base_fare_30min: 2250,
+                additional_fare_5min: 375,
+                price_per_hour: 4500,
+                capacity: 132,
+                difficulty_score: 3,
+                has_roof: true,
+                disabled_discount_rate: null,
+                eco_car_discount_rate: null,
+                two_child_discount_rate: null,
+                three_child_discount_rate: null,
+                is_public_parking: false
+            }
+        ];
+
+        // 사용자 모드 및 선호도 설정
+        let userMode = {
+            isLoggedIn: false,
+            preferenceType: null,
+            weights: {
+                alpha: 0.5,
+                beta: 0.5,
+                gamma: 0.0
+            },
+            vehicleInfo: {
+                type: 'sedan', // sedan, suv, electric
+                height: 1.5, // 미터 단위
+                hasDisability: false,
+                hasEcoCar: false,
+                childrenCount: 0 // 0, 2, 3+
+            }
+        };
+
+        // 선호도 타입별 가중치 프리셋
+        const preferencePresets = {
+            alpha: { alpha: 0.7, beta: 0.2, gamma: 0.1 },
+            beta: { alpha: 0.2, beta: 0.7, gamma: 0.1 },
+            gamma: { alpha: 0.2, beta: 0.2, gamma: 0.6 }
+        };
+
+        // 기본 위치 (광진구 중앙)
+        const baseLocation = {
+            lat: 37.5442,
+            lng: 127.0778,
+            address: "광진구 중앙"
+        };
+
+        // 카카오맵 초기화
+        function initializeKakaoMap() {
+            const mapContainer = document.getElementById('map');
+            const mapOption = {
+                center: new kakao.maps.LatLng(baseLocation.lat, baseLocation.lng),
+                level: 5
+            };
+
+            map = new kakao.maps.Map(mapContainer, mapOption);
+            
+            // 줌 컨트롤 추가
+            const zoomControl = new kakao.maps.ZoomControl();
+            map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+            // 지도 타입 컨트롤 추가
+            const mapTypeControl = new kakao.maps.MapTypeControl();
+            map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+            console.log('카카오맵이 초기화되었습니다.');
+        }
+
+        // 사용자 현재 위치 가져오기
+        function getCurrentLocation() {
+            if (!navigator.geolocation) {
+                console.log('Geolocation을 사용할 수 없습니다.');
+                showLocationError('Geolocation을 지원하지 않는 브라우저입니다.');
+                return;
+            }
+
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000
+            };
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    currentUserLocation = {
+                        lat: lat,
+                        lng: lng,
+                        accuracy: position.coords.accuracy
+                    };
+
+                    console.log('현재 위치:', currentUserLocation);
+                    
+                    // 지도 중심을 사용자 위치로 이동
+                    if (map) {
+                        const userPosition = new kakao.maps.LatLng(lat, lng);
+                        map.setCenter(userPosition);
+                        map.setLevel(4);
+
+                        // 사용자 위치 마커 표시
+                        showUserLocationMarker(userPosition);
+                        
+                        // 주차장 검색 결과 업데이트
+                        if (parkingMarkers.length > 0) {
+                            updateParkingMarkers();
+                        }
+                    }
+
+                    // UI 업데이트
+                    updateLocationStatus(true, `${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                },
+                function(error) {
+                    console.error('위치 정보 오류:', error);
+                    let errorMessage = '';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = '위치 접근이 거부되었습니다. 브라우저 설정에서 위치 접근을 허용해주세요.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = '위치 정보를 사용할 수 없습니다.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = '위치 요청 시간이 초과되었습니다.';
+                            break;
+                        default:
+                            errorMessage = '알 수 없는 오류가 발생했습니다.';
+                            break;
+                    }
+                    
+                    showLocationError(errorMessage);
+                    updateLocationStatus(false, '위치 정보 없음');
+                },
+                options
+            );
+        }
+
+        // 사용자 위치 마커 표시
+        function showUserLocationMarker(position) {
+            // 기존 사용자 마커 제거
+            if (userMarker) {
+                userMarker.setMap(null);
+            }
+
+            // 사용자 위치 마커 생성
+            const imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png';
+            const imageSize = new kakao.maps.Size(24, 35);
+            const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+            userMarker = new kakao.maps.Marker({
+                position: position,
+                image: markerImage,
+                title: '현재 위치'
+            });
+
+            userMarker.setMap(map);
+
+            // 인포윈도우 생성
+            const infoWindow = new kakao.maps.InfoWindow({
+                content: '<div style="padding:5px; font-size:12px; font-weight:bold;">📍 현재 위치</div>'
+            });
+
+            infoWindow.open(map, userMarker);
+        }
+
+        // 위치 오류 표시
+        function showLocationError(message) {
+            const statusDiv = document.getElementById('locationStatus');
+            if (statusDiv) {
+                statusDiv.innerHTML = `
+                    <div style="color: #ff6b6b; font-size: 0.9rem; padding: 8px; background: #ffe6e6; border-radius: 6px; margin: 8px 0;">
+                        ⚠️ ${message}
+                    </div>
+                `;
+            }
+        }
+
+        // 위치 상태 업데이트
+        function updateLocationStatus(success, message) {
+            const statusDiv = document.getElementById('locationStatus');
+            if (statusDiv) {
+                if (success) {
+                    statusDiv.innerHTML = `
+                        <div style="color: #4CAF50; font-size: 0.9rem; padding: 8px; background: #e8f5e8; border-radius: 6px; margin: 8px 0;">
+                            📍 위치 정보: ${message}
+                        </div>
+                    `;
+                } else {
+                    statusDiv.innerHTML = `
+                        <div style="color: #ff9800; font-size: 0.9rem; padding: 8px; background: #fff3e0; border-radius: 6px; margin: 8px 0;">
+                            ⚠️ ${message}
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // DOM 요소들
+        const voiceBtn = document.getElementById('voiceBtn');
+        const statusCard = document.getElementById('statusCard');
+        const statusText = document.getElementById('statusText');
+        const recognitionResult = document.getElementById('recognitionResult');
+        const recognizedText = document.getElementById('recognizedText');
+
+        // 음성 인식 변수
+        let recognition;
+        let isListening = false;
+
+        // 사용자 모드 토글
+        function toggleUserMode() {
+            userMode.isLoggedIn = !userMode.isLoggedIn;
+            updateUserInterface();
+        }
+
+        // 사용자 인터페이스 업데이트
+        function updateUserInterface() {
+            const loginIndicator = document.getElementById('loginIndicator');
+            const vehicleInfoSelector = document.getElementById('vehicleInfoSelector');
+            const preferenceSelector = document.getElementById('preferenceSelector');
+            const userStatus = document.getElementById('userStatus');
+            const userStatusTitle = document.getElementById('userStatusTitle');
+            const userStatusContent = document.getElementById('userStatusContent');
+
+            if (userMode.isLoggedIn) {
+                loginIndicator.innerHTML = '👤 회원 모드';
+                loginIndicator.style.background = 'rgba(76, 175, 80, 0.3)';
+                vehicleInfoSelector.style.display = 'block';
+                preferenceSelector.style.display = 'block';
+                userStatus.classList.remove('guest');
+                userStatusTitle.innerHTML = '🌟 회원 사용자';
+                userStatusContent.innerHTML = `
+                    📍 개인화된 추천 알고리즘<br>
+                    🚗 차량 정보: ${getVehicleInfoText()}<br>
+                    💳 개인별 할인 혜택 적용
+                `;
+            } else {
+                loginIndicator.innerHTML = '👤 게스트 모드';
+                loginIndicator.style.background = 'rgba(255,255,255,0.2)';
+                vehicleInfoSelector.style.display = 'none';
+                preferenceSelector.style.display = 'none';
+                userStatus.classList.add('guest');
+                userStatusTitle.innerHTML = '🌟 게스트 사용자';
+                userStatusContent.innerHTML = `
+                    📍 최단거리 + 최저가 기준 추천<br>
+                    🚗 일반 승용차 가정<br>
+                    ⚠️ 개인 할인 혜택 없음
+                `;
+                userMode.preferenceType = null;
+            }
+            updateAlgorithmDisplay();
+            updateSearchConditions();
+        }
+
+        // 검색 조건 업데이트
+        function updateSearchConditions() {
+            const vehicleCondition = document.getElementById('vehicleCondition');
+            const criteriaCondition = document.getElementById('criteriaCondition');
+            const discountCondition = document.getElementById('discountCondition');
+
+            // 차량 조건 업데이트
+            const vehicleInfo = userMode.vehicleInfo;
+            let vehicleText = '';
+            if (vehicleInfo.type === 'electric') vehicleText = '전기차';
+            else if (vehicleInfo.type === 'suv') vehicleText = 'SUV';
+            else vehicleText = '일반 승용차';
+            vehicleText += ` (${vehicleInfo.height}m 이하)`;
+            vehicleCondition.textContent = `차량: ${vehicleText}`;
+
+            // 기준 업데이트
+            if (userMode.isLoggedIn && userMode.preferenceType) {
+                const preferenceText = userMode.preferenceType === 'alpha' ? '가격 우선' : 
+                                     userMode.preferenceType === 'beta' ? '시간 우선' : '편의 우선';
+                criteriaCondition.textContent = `기준: ${preferenceText} (개인화 알고리즘)`;
+            } else {
+                criteriaCondition.textContent = '기준: 거리 + 가격 최적화';
+            }
+
+            // 할인 조건 업데이트
+            if (userMode.isLoggedIn) {
+                const discounts = [];
+                if (vehicleInfo.hasDisability) discounts.push('장애인');
+                if (vehicleInfo.hasEcoCar) discounts.push('친환경차');
+                if (vehicleInfo.childrenCount >= 2) discounts.push('다자녀');
+                
+                if (discounts.length > 0) {
+                    discountCondition.textContent = `할인: ${discounts.join(', ')} 할인 적용`;
+                } else {
+                    discountCondition.textContent = '할인: 적용 가능한 할인 없음';
+                }
+            } else {
+                discountCondition.textContent = '할인: 적용 없음 (게스트)';
+            }
+        }
+
+        // 차량 정보 텍스트 생성
+        function getVehicleInfoText() {
+            const vehicle = userMode.vehicleInfo;
+            let text = '';
+            
+            if (vehicle.type === 'electric') text += '전기차';
+            else if (vehicle.type === 'suv') text += 'SUV';
+            else text += '일반차';
+            
+            text += ` (${vehicle.height}m)`;
+            
+            const discounts = [];
+            if (vehicle.hasDisability) discounts.push('장애인');
+            if (vehicle.hasEcoCar) discounts.push('친환경');
+            if (vehicle.childrenCount >= 2) discounts.push(`${vehicle.childrenCount}자녀`);
+            
+            if (discounts.length > 0) {
+                text += ` - ${discounts.join(', ')} 할인`;
+            }
+            
+            return text;
+        }
+
+        // 차량 정보 업데이트
+        function updateVehicleInfo() {
+            const vehicleType = document.getElementById('vehicleType').value;
+            const vehicleHeight = parseFloat(document.getElementById('vehicleHeight').value);
+            const hasDisability = document.getElementById('hasDisability').checked;
+            const hasEcoCar = document.getElementById('hasEcoCar').checked;
+            const childrenCount = parseInt(document.getElementById('childrenCount').value);
+
+            userMode.vehicleInfo = {
+                type: vehicleType,
+                height: vehicleHeight,
+                hasDisability: hasDisability,
+                hasEcoCar: hasEcoCar,
+                childrenCount: childrenCount
+            };
+
+            // 차량 타입에 따른 높이 자동 설정
+            if (vehicleType === 'suv') {
+                document.getElementById('vehicleHeight').value = '2.0';
+                userMode.vehicleInfo.height = 2.0;
+            } else if (vehicleType === 'electric') {
+                document.getElementById('vehicleHeight').value = '1.5';
+                userMode.vehicleInfo.height = 1.5;
+                document.getElementById('hasEcoCar').checked = true;
+                userMode.vehicleInfo.hasEcoCar = true;
+            }
+
+            updateUserInterface();
+        }
+
+        // 선호도 선택
+        function selectPreference(type) {
+            userMode.preferenceType = type;
+            userMode.weights = preferencePresets[type];
+
+            // UI 업데이트
+            document.querySelectorAll('.preference-type').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('selected');
+
+            updateAlgorithmDisplay();
+        }
+
+        // 알고리즘 표시 업데이트
+        function updateAlgorithmDisplay() {
+            const currentAlgorithm = document.getElementById('currentAlgorithm');
+            const algorithmDisplay = document.getElementById('algorithmDisplay');
+            const algorithmExplanation = document.getElementById('algorithmExplanation');
+
+            if (userMode.isLoggedIn && userMode.preferenceType) {
+                const weights = userMode.weights;
+                const algorithmText = `Score = ${weights.alpha}×(1/총요금) + ${weights.beta}×(1/예상시간) + ${weights.gamma}×(4-난이도)`;
+                
+                if (algorithmDisplay) {
+                    algorithmDisplay.innerHTML = algorithmText;
+                }
+
+                currentAlgorithm.innerHTML = `
+                    <div style="font-family: 'Courier New', monospace; background: #f0f0f0; padding: 12px; border-radius: 8px; margin: 12px 0;">
+                        ${algorithmText}
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                        ${userMode.preferenceType}형 사용자: ${getPreferenceDescription(userMode.preferenceType)}
+                    </div>
+                `;
+
+                algorithmExplanation.innerHTML = `
+                    <div style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);">
+                        <strong>${userMode.preferenceType}형 모드:</strong> ${getPreferenceDescription(userMode.preferenceType)}<br>
+                        • 가격 가중치: ${weights.alpha}<br>
+                        • 시간 가중치: ${weights.beta}<br>
+                        • 편의 가중치: ${weights.gamma}<br>
+                        • 개인화된 할인 혜택 적용
+                    </div>
+                `;
+            } else {
+                currentAlgorithm.innerHTML = `
+                    <div style="font-family: 'Courier New', monospace; background: #f0f0f0; padding: 12px; border-radius: 8px; margin: 12px 0;">
+                        Score = 0.5×거리점수 + 0.5×가격점수
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                        게스트 모드: 간단한 거리+가격 기준
+                    </div>
+                `;
+
+                algorithmExplanation.innerHTML = `
+                    <div style="font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);">
+                        <strong>게스트 모드:</strong> 거리와 가격만을 고려한 단순 추천<br>
+                        • 거리 점수: (1 - 거리/10km)<br>
+                        • 가격 점수: (1 - 요금/10000원)<br>
+                        • 요금 구조: 30분 기본요금 + 5분당 추가요금<br>
+                        • 최종 점수: 거리×0.5 + 가격×0.5
+                    </div>
+                `;
+            }
+        }
+
+        // 선호도 설명
+        function getPreferenceDescription(type) {
+            const descriptions = {
+                alpha: '가격을 최우선으로 고려',
+                beta: '이동 시간을 최우선으로 고려',
+                gamma: '편의성을 최우선으로 고려'
+            };
+            return descriptions[type] || '기본 설정';
+        }
+
+        // 음성 인식 초기화
+        function initializeSpeechRecognition() {
+            if ('SpeechRecognition' in window) {
+                recognition = new SpeechRecognition();
+            } else if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+            } else {
+                statusCard.className = 'status-card error';
+                statusText.textContent = '❌ 음성 인식을 지원하지 않는 브라우저입니다.';
+                return false;
+            }
+
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'ko-KR';
+
+            recognition.onstart = function() {
+                isListening = true;
+                voiceBtn.classList.add('recording');
+                statusCard.className = 'status-card listening';
+                statusText.textContent = '🎤 음성 인식 중... 주차장 관련 명령어를 말해보세요!';
+            };
+
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                let interimTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                if (finalTranscript) {
+                    recognizedText.textContent = finalTranscript;
+                    recognitionResult.style.display = 'block';
+                    processVoiceCommand(finalTranscript);
+                }
+            };
+
+            recognition.onerror = function(event) {
+                statusCard.className = 'status-card error';
+                statusText.textContent = '❌ 오류: ' + event.error;
+                resetVoiceButton();
+            };
+
+            recognition.onend = function() {
+                statusCard.className = 'status-card';
+                statusText.textContent = 'Ready for voice command';
+                resetVoiceButton();
+            };
+
+            return true;
+        }
+
+        // 음성 버튼 리셋
+        function resetVoiceButton() {
+            isListening = false;
+            voiceBtn.classList.remove('recording');
+        }
+
+        // 음성 명령어 처리
+        function processVoiceCommand(text) {
+            console.log('처리할 명령어:', text);
+            
+            // 시간 추출
+            const hours = extractHours(text);
+            
+            // 주차장 검색 실행
+            if (text.includes('주차') || text.includes('주차장') || text.includes('주차공간')) {
+                // 전기차 관련 명령어 감지
+                if (text.includes('전기차') || text.includes('충전') || text.includes('EV')) {
+                    console.log('전기차 주차장 검색 요청 감지');
+                }
+                
+                // SUV 관련 명령어 감지
+                if (text.includes('SUV') || text.includes('에스유비') || text.includes('대형차')) {
+                    console.log('SUV 주차장 검색 요청 감지');
+                }
+                
+                searchParkingLots(hours, text);
+            }
+        }
+
+        // 시간 추출
+        function extractHours(text) {
+            const hourPatterns = [
+                /(\d+)시간/,
+                /(\d+)시간동안/,
+                /(\d+)시간 동안/
+            ];
+            
+            for (const pattern of hourPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    const hours = parseInt(match[1]);
+                    if (hours >= 1 && hours <= 24) {
+                        return hours;
+                    }
+                }
+            }
+            
+            return 2; // 기본값
+        }
+
+        // 빠른 검색
+        function quickSearch(hours) {
+            searchParkingLots(hours, `${hours}시간 주차장 찾기`);
+        }
+
+        // 전기차 빠른 검색
+        function quickSearchEV(hours) {
+            searchParkingLots(hours, `전기차 ${hours}시간 주차장 찾기`);
+        }
+
+        // 주차장 검색 및 추천
+        function searchParkingLots(hours, originalText) {
+            const recommendationsSection = document.getElementById('recommendationsSection');
+            const parkingList = document.getElementById('parkingList');
+            
+            recommendationsSection.style.display = 'block';
+            parkingList.innerHTML = '<div style="text-align: center; padding: 20px;">🔄 검색 중...</div>';
+
+            // 실제 검색 로직 시뮬레이션
+            setTimeout(() => {
+                const results = findOptimalParking(hours, originalText);
+                displayResults(results, hours);
+                showScoreBreakdown(results);
+            }, 1500);
+        }
+
+        // 최적 주차장 찾기
+        function findOptimalParking(hours, text) {
+            let results = [...parkingDatabase];
+            
+            // 차량 타입에 따른 필터링
+            results = filterByVehicleType(results, text);
+            
+            // 각 주차장에 대해 점수 계산
+            results = results.map(lot => {
+                const distance = calculateDistance(baseLocation.lat, baseLocation.lng, lot.lat, lot.lng);
+                const totalCost = calculateTotalCost(lot, hours);
+                const score = calculateScore(lot, distance, totalCost, hours);
+                
+                return {
+                    ...lot,
+                    distance: distance,
+                    totalCost: totalCost,
+                    score: score,
+                    appliedDiscounts: getAppliedDiscounts(lot)
+                };
+            });
+
+            // 점수순으로 정렬
+            results.sort((a, b) => b.score - a.score);
+            
+            return results;
+        }
+
+        // 차량 타입에 따른 필터링
+        function filterByVehicleType(results, text) {
+            const vehicleInfo = userMode.vehicleInfo;
+            let filtered = [...results];
+
+            // 전기차 요구사항 체크
+            if (text.includes('전기차') || text.includes('충전') || vehicleInfo.type === 'electric') {
+                filtered = filtered.filter(lot => lot.ev_charging === true);
+            }
+
+            // 차량 높이 제한 체크
+            if (vehicleInfo.type === 'suv' || vehicleInfo.type === 'electric') {
+                filtered = filtered.filter(lot => {
+                    if (!lot.height_limit_m) return true; // 높이 제한이 없으면 통과
+                    const heightLimit = parseFloat(lot.height_limit_m.replace(/[^\d.]/g, ''));
+                    return heightLimit >= vehicleInfo.height;
+                });
+            }
+
+            return filtered;
+        }
+
+        // 총 비용 계산 (할인 적용)
+        function calculateTotalCost(lot, hours) {
+            // 30분 기본요금 + 5분당 추가요금 구조로 계산
+            let totalMinutes = hours * 60;
+            let baseCost = 0;
+            
+            if (totalMinutes <= 30) {
+                // 30분 이하: 기본요금만
+                baseCost = lot.base_fare_30min || (lot.price_per_hour / 2);
+            } else {
+                // 30분 초과: 기본요금 + 추가요금
+                baseCost = lot.base_fare_30min || (lot.price_per_hour / 2);
+                const additionalMinutes = totalMinutes - 30;
+                const additional5MinBlocks = Math.ceil(additionalMinutes / 5);
+                const additionalCost = additional5MinBlocks * (lot.additional_fare_5min || (lot.price_per_hour / 12));
+                baseCost += additionalCost;
+            }
+            
+            if (userMode.isLoggedIn) {
+                const discounts = getAppliedDiscounts(lot);
+                let discountRate = 0;
+                
+                // 가장 높은 할인율 적용
+                if (discounts.disabled > discountRate) discountRate = discounts.disabled;
+                if (discounts.eco > discountRate) discountRate = discounts.eco;
+                if (discounts.children > discountRate) discountRate = discounts.children;
+                
+                if (discountRate > 0) {
+                    baseCost = baseCost * (1 - discountRate / 100);
+                }
+            }
+            
+            return Math.round(baseCost);
+        }
+
+        // 적용 가능한 할인 정보 계산
+        function getAppliedDiscounts(lot) {
+            const vehicleInfo = userMode.vehicleInfo;
+            const discounts = {
+                disabled: 0,
+                eco: 0,
+                children: 0
+            };
+
+            if (userMode.isLoggedIn) {
+                if (vehicleInfo.hasDisability && lot.disabled_discount_rate) {
+                    discounts.disabled = lot.disabled_discount_rate;
+                }
+                
+                if (vehicleInfo.hasEcoCar && lot.eco_car_discount_rate) {
+                    discounts.eco = lot.eco_car_discount_rate;
+                }
+                
+                if (vehicleInfo.childrenCount >= 2 && lot.two_child_discount_rate) {
+                    discounts.children = lot.two_child_discount_rate;
+                }
+                
+                if (vehicleInfo.childrenCount >= 3 && lot.three_child_discount_rate) {
+                    discounts.children = lot.three_child_discount_rate;
+                }
+            }
+
+            return discounts;
+        }
+
+        // 거리 계산 (Haversine 공식)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // 지구 반지름 (km)
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // 지도에 주차장 마커 표시
+        function displayParkingMarkers(results) {
+            // 기존 주차장 마커들 제거
+            clearParkingMarkers();
+
+            if (!map || !results || results.length === 0) {
+                console.log('표시할 주차장이 없습니다.');
+                return;
+            }
+
+            // 사용자 위치 또는 기본 위치
+            const userLat = currentUserLocation ? currentUserLocation.lat : baseLocation.lat;
+            const userLon = currentUserLocation ? currentUserLocation.lng : baseLocation.lng;
+
+            // 지도 범위 설정을 위한 좌표 배열
+            const bounds = new kakao.maps.LatLngBounds();
+
+            results.forEach((lot, index) => {
+                const position = new kakao.maps.LatLng(lot.lat, lot.lng);
+                
+                // 거리 계산
+                const distance = calculateDistance(userLat, userLon, lot.lat, lot.lng);
+                
+                // 마커 이미지 설정 (순위에 따라 다른 색상)
+                let markerImageSrc = '';
+                if (index === 0) {
+                    markerImageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png'; // 1위: 빨간색
+                } else if (index === 1) {
+                    markerImageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_orange.png'; // 2위: 주황색
+                } else if (index === 2) {
+                    markerImageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_blue.png'; // 3위: 파란색
+                } else {
+                    markerImageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_gray.png'; // 기타: 회색
+                }
+
+                const imageSize = new kakao.maps.Size(24, 35);
+                const markerImage = new kakao.maps.MarkerImage(markerImageSrc, imageSize);
+
+                // 마커 생성
+                const marker = new kakao.maps.Marker({
+                    position: position,
+                    image: markerImage,
+                    title: lot.name
+                });
+
+                marker.setMap(map);
+                parkingMarkers.push(marker);
+
+                // 인포윈도우 내용 생성
+                const infoContent = `
+                    <div style="padding: 10px; min-width: 200px; font-size: 12px;">
+                        <div style="font-weight: bold; margin-bottom: 5px; color: #333;">
+                            ${index + 1}. ${lot.name}
+                        </div>
+                        <div style="margin-bottom: 3px;">
+                            💰 <strong>${lot.totalCost.toLocaleString()}원</strong>
+                        </div>
+                        <div style="margin-bottom: 3px;">
+                            📍 ${distance.toFixed(2)}km
+                        </div>
+                        <div style="margin-bottom: 3px;">
+                            🅿️ ${lot.capacity || 'N/A'}대
+                        </div>
+                        <div style="margin-bottom: 3px;">
+                            🔌 ${lot.ev_charging ? '전기차충전 O' : '전기차충전 X'}
+                        </div>
+                        <div style="margin-bottom: 5px;">
+                            ⏰ ${lot.open_24h ? '24시간' : '시간제한'}
+                        </div>
+                        <div style="font-size: 10px; color: #666;">
+                            📍 ${lot.address}
+                        </div>
+                        <button onclick="navigateToParking('${lot.name}')" 
+                                style="margin-top: 5px; padding: 3px 8px; font-size: 10px; 
+                                       background: #007bff; color: white; border: none; 
+                                       border-radius: 3px; cursor: pointer;">
+                            🧭 길찾기
+                        </button>
+                    </div>
+                `;
+
+                // 인포윈도우 생성
+                const infowindow = new kakao.maps.InfoWindow({
+                    content: infoContent,
+                    removable: true
+                });
+
+                // 마커 클릭 이벤트
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    // 다른 인포윈도우 닫기
+                    closeAllInfoWindows();
+                    // 클릭한 마커의 인포윈도우 열기
+                    infowindow.open(map, marker);
+                });
+
+                // 지도 범위에 추가
+                bounds.extend(position);
+            });
+
+            // 지도 범위 설정 (모든 마커가 보이도록)
+            if (results.length > 1) {
+                map.setBounds(bounds);
+            } else if (results.length === 1) {
+                map.setCenter(new kakao.maps.LatLng(results[0].lat, results[0].lng));
+                map.setLevel(3);
+            }
+
+            console.log(`${results.length}개의 주차장 마커가 표시되었습니다.`);
+        }
+
+        // 기존 주차장 마커들 제거
+        function clearParkingMarkers() {
+            parkingMarkers.forEach(marker => {
+                marker.setMap(null);
+            });
+            parkingMarkers = [];
+        }
+
+        // 모든 인포윈도우 닫기
+        function closeAllInfoWindows() {
+            // 카카오맵 API의 인포윈도우는 자동으로 관리되므로 별도 처리 불필요
+        }
+
+        // 주차장 마커 업데이트 (사용자 위치 변경 시)
+        function updateParkingMarkers() {
+            // 현재 검색 결과가 있다면 마커 다시 표시
+            const currentResults = window.lastSearchResults;
+            if (currentResults && currentResults.length > 0) {
+                displayParkingMarkers(currentResults);
+            }
+        }
+
+        // 점수 계산
+        function calculateScore(lot, distance, cost, hours) {
+            if (userMode.isLoggedIn && userMode.preferenceType) {
+                const weights = userMode.weights;
+                const priceScore = weights.alpha * (1 / (cost + 1));
+                const timeScore = weights.beta * (1 / (distance + 0.1));
+                const convenienceScore = weights.gamma * (4 - lot.difficulty_score);
+                
+                return (priceScore + timeScore + convenienceScore) * 100;
+            } else {
+                // 게스트 모드: 단순 거리+가격
+                const distanceScore = Math.max(0, 1 - distance / 10);
+                const priceScore = Math.max(0, 1 - cost / 10000);
+                
+                // 전기차 요구사항이 있으면 전기차 충전 가능한 주차장에 가점
+                let evBonus = 0;
+                if (lot.ev_charging) evBonus = 10;
+                
+                return (distanceScore + priceScore) * 50 + evBonus;
+            }
+        }
+
+        // 결과 표시
+        function displayResults(results, hours) {
+            const parkingList = document.getElementById('parkingList');
+            
+            // 검색 결과를 전역 변수에 저장 (지도 마커 업데이트용)
+            window.lastSearchResults = results;
+            
+            if (results.length === 0) {
+                parkingList.innerHTML = '<div style="text-align: center; color: #666;">조건에 맞는 주차장을 찾을 수 없습니다.</div>';
+                // 지도에서도 마커 제거
+                clearParkingMarkers();
+                return;
+            }
+
+            // 지도에 마커 표시
+            if (map) {
+                displayParkingMarkers(results);
+            }
+
+            let html = '';
+            results.slice(0, 3).forEach((lot, index) => {
+                const typeClass = userMode.preferenceType || 'default';
+                // 원래 비용 계산 (30분 기본요금 + 5분당 추가요금)
+                let originalCost = 0;
+                const totalMinutes = hours * 60;
+                if (totalMinutes <= 30) {
+                    originalCost = lot.base_fare_30min || (lot.price_per_hour / 2);
+                } else {
+                    originalCost = lot.base_fare_30min || (lot.price_per_hour / 2);
+                    const additionalMinutes = totalMinutes - 30;
+                    const additional5MinBlocks = Math.ceil(additionalMinutes / 5);
+                    const additionalCost = additional5MinBlocks * (lot.additional_fare_5min || (lot.price_per_hour / 12));
+                    originalCost += additionalCost;
+                }
+                const discountAmount = Math.round(originalCost) - lot.totalCost;
+                const discountText = discountAmount > 0 ? ` (${discountAmount.toLocaleString()}원 할인)` : '';
+                
+                html += `
+                    <div class="parking-card ${typeClass}">
+                        <div class="parking-header">
+                            <div class="parking-name">${index + 1}. ${lot.name}</div>
+                            <div class="score-display">점수: ${lot.score.toFixed(1)}</div>
+                        </div>
+                        <div class="parking-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">💰</span>
+                                <span>${lot.totalCost.toLocaleString()}원${discountText} (${hours}h)</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">📍</span>
+                                <span>${lot.distance.toFixed(2)}km</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🅿️</span>
+                                <span>${lot.capacity || 'N/A'}대</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🚗</span>
+                                <span>높이: ${lot.height_limit_m || '제한없음'}</span>
+                            </div>
+                        </div>
+                        <div class="parking-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🔌</span>
+                                <span>${lot.ev_charging ? '전기차충전 O' : '전기차충전 X'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🏠</span>
+                                <span>${lot.has_roof ? '지붕 O' : '지붕 X'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">⏰</span>
+                                <span>${lot.open_24h ? '24시간' : '시간제한'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🏛️</span>
+                                <span>${lot.is_public_parking ? '공영' : '민영'}</span>
+                            </div>
+                        </div>
+                        ${getDiscountInfo(lot.appliedDiscounts)}
+                        <div style="font-size: 0.9rem; color: #666; margin: 8px 0;">
+                            📍 ${lot.address}
+                        </div>
+                        <button class="navigate-btn" onclick="navigateToParking('${lot.name}')">
+                            🧭 길찾기
+                        </button>
+                    </div>
+                `;
+            });
+
+            parkingList.innerHTML = html;
+        }
+
+        // 할인 정보 표시
+        function getDiscountInfo(discounts) {
+            if (!userMode.isLoggedIn) return '';
+            
+            const appliedDiscounts = [];
+            if (discounts.disabled > 0) appliedDiscounts.push(`장애인 ${discounts.disabled}%`);
+            if (discounts.eco > 0) appliedDiscounts.push(`친환경 ${discounts.eco}%`);
+            if (discounts.children > 0) appliedDiscounts.push(`다자녀 ${discounts.children}%`);
+            
+            if (appliedDiscounts.length > 0) {
+                return `
+                    <div style="background: #E8F5E8; padding: 8px; border-radius: 6px; margin: 8px 0; font-size: 0.9rem;">
+                        <span style="font-weight: bold; color: #4CAF50;">💳 적용된 할인:</span> ${appliedDiscounts.join(', ')}
+                    </div>
+                `;
+            }
+            
+            return '';
+        }
+
+        // 점수 상세 분석 표시
+        function showScoreBreakdown(results) {
+            const scoreBreakdown = document.getElementById('scoreBreakdown');
+            const scoreDetails = document.getElementById('scoreDetails');
+            
+            if (results.length > 0 && userMode.isLoggedIn && userMode.preferenceType) {
+                const topResult = results[0];
+                const weights = userMode.weights;
+                
+                scoreDetails.innerHTML = `
+                    <div style="font-size: 0.9rem; line-height: 1.6;">
+                        <strong>1위 주차장: ${topResult.name}</strong><br>
+                        • 가격 점수: ${(weights.alpha * (1 / (topResult.totalCost + 1)) * 100).toFixed(1)}점<br>
+                        • 시간 점수: ${(weights.beta * (1 / (topResult.distance + 0.1)) * 100).toFixed(1)}점<br>
+                        • 편의 점수: ${(weights.gamma * (4 - topResult.difficultyScore) * 100).toFixed(1)}점<br>
+                        • <strong>최종 점수: ${topResult.score.toFixed(1)}점</strong>
+                    </div>
+                `;
+                scoreBreakdown.style.display = 'block';
+            } else {
+                scoreBreakdown.style.display = 'none';
+            }
+        }
+
+        // 길찾기
+        function navigateToParking(name) {
+            // 주차장 정보 찾기
+            const parkingLot = parkingDatabase.find(lot => lot.name === name);
+            if (!parkingLot) {
+                alert('주차장 정보를 찾을 수 없습니다.');
+                return;
+            }
+
+            // 사용자 위치가 있으면 카카오맵 길찾기, 없으면 주소만 표시
+            if (currentUserLocation) {
+                // 카카오맵 길찾기 URL 생성
+                const startLat = currentUserLocation.lat;
+                const startLng = currentUserLocation.lng;
+                const endLat = parkingLot.lat;
+                const endLng = parkingLot.lng;
+                
+                const kakaoMapUrl = `https://map.kakao.com/link/to/${name},${endLat},${endLng}`;
+                window.open(kakaoMapUrl, '_blank');
+                
+                console.log(`${name}으로 길찾기를 시작합니다.`);
+            } else {
+                // 주소 정보만 표시
+                alert(`${name}\n📍 주소: ${parkingLot.address}\n\n위치 정보를 허용하면 길찾기가 가능합니다.`);
+            }
+        }
+
+        // 음성 버튼 이벤트
+        voiceBtn.addEventListener('click', function() {
+            if (!isListening) {
+                if (initializeSpeechRecognition()) {
+                    recognition.start();
+                }
+            } else {
+                recognition.stop();
+            }
+        });
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUserInterface();
+            updateSearchConditions();
+            
+            // 카카오맵 초기화
+            if (typeof kakao !== 'undefined' && kakao.maps) {
+                initializeKakaoMap();
+            } else {
+    console.log('카카오맵 API 로딩 중...');
+    // API가 로드될 때까지 잠시 대기
+    setTimeout(() => {
+        if (typeof kakao !== 'undefined' && kakao.maps) {
+            initializeKakaoMap();
+        } else {
+            console.log('카카오맵 API 로딩 실패');
+        }
+    }, 1000);
+}
+            
+            console.log('SPARK Final Algorithm Version 로드 완료');
+        });
+    </script>
+</body>
+</html>

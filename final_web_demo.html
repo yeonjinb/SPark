@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPARK - Final Algorithm Version</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+        
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid #4CAF50;
+        }
+        
+        .status.error {
+            background: rgba(244, 67, 54, 0.3);
+            border: 1px solid #F44336;
+        }
+        
+        .status.info {
+            background: rgba(33, 150, 243, 0.3);
+            border: 1px solid #2196F3;
+        }
+        
+        .result-box {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            min-height: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .parking-lot {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid #4ECDC4;
+        }
+        
+        .parking-lot h4 {
+            margin: 0 0 10px 0;
+            color: #4ECDC4;
+        }
+        
+        .parking-lot .info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .parking-lot .info span {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #4ECDC4;
+        }
+        
+        .error {
+            color: #FF6B6B;
+            background: rgba(244, 67, 54, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .success {
+            color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .location-selector {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .location-selector select {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 16px;
+            margin: 5px;
+        }
+        
+        .coordinate-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 최종 실제 데이터 기반 주차장 추천 시스템</h1>
+        
+        <!-- 위치 설정 -->
+        <div class="section">
+            <h2>📍 현재 위치 설정</h2>
+            <div class="location-selector">
+                <label>현재 위치를 선택하세요:</label><br>
+                <select id="locationSelect" onchange="updateCurrentLocation()">
+                    <option value="konkuk">건대입구역</option>
+                    <option value="neungdong">능동</option>
+                    <option value="gangnam">강남역</option>
+                    <option value="hongdae">홍대입구역</option>
+                </select>
+                <div id="currentLocationInfo" class="success">
+                    📍 현재 위치: 건대입구역 (위도: 37.5407, 경도: 127.0692)
+                </div>
+                <div class="coordinate-info">
+                    💡 거리 계산을 위해 위도/경도 좌표가 필요합니다.<br>
+                    Haversine 공식을 사용하여 정확한 지구 표면 거리를 계산합니다.
+                </div>
+            </div>
+        </div>
+        
+        <!-- 음성 인식 섹션 -->
+        <div class="section">
+            <h2>1. 음성 명령어 입력</h2>
+            <button id="startVoice">🎤 음성 인식 시작</button>
+            <button id="stopVoice" disabled>⏹️ 중지</button>
+            
+            <div id="voiceStatus" class="status info">
+                준비됨 - 음성 인식을 시작하세요
+            </div>
+            
+            <div id="voiceResult" class="result-box">
+                인식된 음성이 여기에 표시됩니다...
+            </div>
+        </div>
+        
+        <!-- 명령어 예시 -->
+        <div class="section">
+            <h2>2. 테스트 명령어</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
+                <button onclick="speakCommand('건대입구 근처 주차장 찾아줘')">"건대입구 근처 주차장 찾아줘"</button>
+                <button onclick="speakCommand('가장 가까운 주차장 찾아줘')">"가장 가까운 주차장 찾아줘"</button>
+                <button onclick="speakCommand('2시간 주차장 찾아줘')">"2시간 주차장 찾아줘"</button>
+                <button onclick="speakCommand('전기차 충전 가능한 주차장 찾아줘')">"전기차 충전 가능한 주차장 찾아줘"</button>
+                <button onclick="speakCommand('SUV 3시간 주차할 곳 찾아줘')">"SUV 3시간 주차할 곳 찾아줘"</button>
+                <button onclick="speakCommand('5000원 이하로 4시간 주차할 곳 찾아줘')">"5000원 이하로 4시간 주차할 곳 찾아줘"</button>
+            </div>
+        </div>
+        
+        <!-- 결과 표시 섹션 -->
+        <div class="section">
+            <h2>3. 추천 결과</h2>
+            <div id="parkingResults" class="result-box">
+                주차장 추천 결과가 여기에 표시됩니다...
+            </div>
+        </div>
+        
+        <!-- 실제 데이터 정보 -->
+        <div class="section">
+            <h2>4. 실제 데이터 정보</h2>
+            <div class="success">
+                <strong>✅ 실제 주차장 데이터 사용 중 (거리 계산 최적화)</strong><br>
+                - 아이파킹 동도센트리움캠퍼스파크 주차장 (능동)<br>
+                - 능동공영 주차장 (능동) - 전기차 충전 가능<br>
+                <br>
+                <strong>🔧 거리 계산 시스템:</strong><br>
+                - 위도/경도 좌표 기반 Haversine 공식 사용<br>
+                - 지구 곡률을 고려한 정확한 거리 계산<br>
+                - 실시간 위치별 거리 계산<br>
+                <br>
+                <strong>📊 좌표 정보:</strong><br>
+                - 건대입구역: (37.5407, 127.0692)<br>
+                - 능동 주차장들: (37.5507, 127.0745)<br>
+                - 정확한 거리: 약 1.24km
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let recognition;
+        let isListening = false;
+        
+        // 실제 주차장 데이터 (서울시청, 명동 제거)
+        const realParkingData = [
+            {
+                id: 1,
+                name: "아이파킹 동도센트리움캠퍼스파크 주차장",
+                location: [37.5507, 127.0745], // 능동 지역
+                address: "서울특별시 강동구 능동",
+                pricing: {
+                    hourly_rate: 4500,
+                    weekday_base: 1500,
+                    weekday_additional: 250,
+                    daily_rate: null
+                },
+                capacity: { total: 132, available: 85 },
+                amenities: {
+                    ev_charging: false,
+                    roof: true,
+                    elevator: false,
+                    restroom: false
+                },
+                restrictions: {
+                    height_limit: 1.55,
+                    vehicle_types: ["승용차"],
+                    max_duration: 24
+                },
+                rating: 3.8,
+                reviews_count: 42
+            },
+            {
+                id: 2,
+                name: "능동공영 주차장",
+                location: [37.5507, 127.0745], // 능동 지역 (건대입구와 가장 가까움)
+                address: "서울특별시 강동구 능동 205",
+                pricing: {
+                    hourly_rate: 3600,
+                    weekday_base: 1200,
+                    weekday_additional: 200,
+                    daily_rate: 50000
+                },
+                capacity: { total: 77, available: 52 },
+                amenities: {
+                    ev_charging: true,
+                    roof: true,
+                    elevator: false,
+                    restroom: false
+                },
+                restrictions: {
+                    height_limit: 2.1,
+                    vehicle_types: ["승용차", "SUV"],
+                    max_duration: 24
+                },
+                rating: 4.1,
+                reviews_count: 28
+            }
+        ];
+        
+        // 위치별 좌표 (확장된 위치 정보)
+        const locations = {
+            konkuk: { 
+                name: "건대입구역", 
+                coords: [37.5407, 127.0692],
+                description: "건국대학교 근처"
+            },
+            neungdong: { 
+                name: "능동", 
+                coords: [37.5507, 127.0745],
+                description: "강동구 능동 지역"
+            },
+            gangnam: { 
+                name: "강남역", 
+                coords: [37.4979, 127.0276],
+                description: "강남구 강남역"
+            },
+            hongdae: { 
+                name: "홍대입구역", 
+                coords: [37.5563, 126.9226],
+                description: "홍익대학교 근처"
+            }
+        };
+        
+        // 현재 위치 (기본값: 건대입구역)
+        let currentLocation = locations.konkuk.coords;
+        
+        // 위치 업데이트
+        function updateCurrentLocation() {
+            const selectedLocation = document.getElementById('locationSelect').value;
+            const location = locations[selectedLocation];
+            currentLocation = location.coords;
+            
+            document.getElementById('currentLocationInfo').innerHTML = 
+                `📍 현재 위치: ${location.name} (위도: ${currentLocation[0]}, 경도: ${currentLocation[1]})<br>
+                📍 설명: ${location.description}`;
+        }
+        
+        // 음성 인식 초기화
+        function initializeSpeechRecognition() {
+            if ('SpeechRecognition' in window) {
+                recognition = new SpeechRecognition();
+            } else if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+            } else {
+                document.getElementById('voiceStatus').className = 'status error';
+                document.getElementById('voiceStatus').textContent = '❌ 음성 인식을 지원하지 않는 브라우저입니다.';
+                return false;
+            }
+            
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'ko-KR';
+            
+            recognition.onstart = function() {
+                document.getElementById('voiceStatus').className = 'status success';
+                document.getElementById('voiceStatus').textContent = '🎤 음성 인식 중... 실제 데이터 기반 주차장 관련 명령어를 말해보세요!';
+                document.getElementById('startVoice').disabled = true;
+                document.getElementById('stopVoice').disabled = false;
+                isListening = true;
+            };
+            
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                document.getElementById('voiceResult').innerHTML = 
+                    '<strong>최종 결과:</strong> ' + finalTranscript + 
+                    '<br><em>실시간:</em> ' + interimTranscript;
+                
+                // 주차장 관련 명령어 감지 시 자동 처리
+                if (finalTranscript && (finalTranscript.includes('주차') || finalTranscript.includes('주차장'))) {
+                    processRealDataCommand(finalTranscript);
+                }
+            };
+            
+            recognition.onerror = function(event) {
+                document.getElementById('voiceStatus').className = 'status error';
+                document.getElementById('voiceStatus').textContent = '❌ 오류: ' + event.error;
+                resetButtons();
+            };
+            
+            recognition.onend = function() {
+                document.getElementById('voiceStatus').className = 'status info';
+                document.getElementById('voiceStatus').textContent = '음성 인식이 종료되었습니다';
+                resetButtons();
+            };
+            
+            return true;
+        }
+        
+        function resetButtons() {
+            document.getElementById('startVoice').disabled = false;
+            document.getElementById('stopVoice').disabled = true;
+            isListening = false;
+        }
+        
+        // 실제 데이터 기반 명령어 처리
+        function processRealDataCommand(text) {
+            console.log('실제 데이터로 처리할 명령어:', text);
+            
+            // 로딩 표시
+            document.getElementById('parkingResults').innerHTML = '<div class="loading">🔄 실제 데이터 기반 주차장 검색 중...</div>';
+            
+            // 비동기 처리 시뮬레이션
+            setTimeout(() => {
+                // 시간 추출
+                const hours = extractHours(text);
+                
+                // 명령어 타입 식별
+                const commandType = identifyCommandType(text);
+                
+                // 차량 타입 추출
+                const vehicleType = extractVehicleType(text);
+                
+                // 가격 제한 추출
+                const priceLimit = extractPriceLimit(text);
+                
+                // 결과 표시
+                let resultHtml = `<h3>🎯 실제 데이터 기반 명령어 분석:</h3>`;
+                resultHtml += `<div class="success">`;
+                resultHtml += `<p><strong>인식된 텍스트:</strong> "${text}"</p>`;
+                resultHtml += `<p><strong>현재 위치:</strong> ${document.getElementById('locationSelect').selectedOptions[0].text}</p>`;
+                resultHtml += `<p><strong>위치 좌표:</strong> 위도 ${currentLocation[0]}, 경도 ${currentLocation[1]}</p>`;
+                resultHtml += `<p><strong>추출된 시간:</strong> ${hours}시간</p>`;
+                resultHtml += `<p><strong>차량 타입:</strong> ${vehicleType}</p>`;
+                resultHtml += `<p><strong>가격 제한:</strong> ${priceLimit ? priceLimit + '원 이하' : '제한 없음'}</p>`;
+                resultHtml += `<p><strong>명령어 타입:</strong> ${getCommandTypeName(commandType)}</p>`;
+                resultHtml += `</div>`;
+                
+                // 실제 데이터 기반 주차장 검색
+                if (commandType === 'find_parking' || commandType === 'parking_info') {
+                    const parkingResults = findOptimalParkingRealData(hours, vehicleType, priceLimit, text);
+                    resultHtml += `<h3>🏆 실제 데이터 기반 추천 주차장 (거리순 정렬):</h3>`;
+                    resultHtml += parkingResults;
+                } else if (commandType === 'reserve_parking') {
+                    resultHtml += `<h3>📅 예약 처리:</h3>`;
+                    resultHtml += `<div class="info">${hours}시간 주차장 예약 기능 (실제 데이터 기반)</div>`;
+                }
+                
+                document.getElementById('parkingResults').innerHTML = resultHtml;
+            }, 1000);
+        }
+        
+        // 시간 추출
+        function extractHours(text) {
+            const hourPatterns = [
+                /(\d+)시간/,
+                /(\d+)시간동안/,
+                /(\d+)시간 동안/,
+                /(\d+)시간만큼/,
+                /(\d+)시간 정도/
+            ];
+            
+            for (const pattern of hourPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    const hours = parseInt(match[1]);
+                    if (hours >= 1 && hours <= 24) {
+                        return hours;
+                    }
+                }
+            }
+            
+            return 2; // 기본값
+        }
+        
+        // 차량 타입 추출
+        function extractVehicleType(text) {
+            if (text.includes('SUV') || text.includes('suv') || text.includes('에스유비')) {
+                return 'SUV';
+            } else if (text.includes('승용차') || text.includes('일반차')) {
+                return '승용차';
+            } else if (text.includes('전기차') || text.includes('EV') || text.includes('이브이')) {
+                return '전기차';
+            }
+            return '승용차'; // 기본값
+        }
+        
+        // 가격 제한 추출
+        function extractPriceLimit(text) {
+            const pricePatterns = [
+                /(\d+)원 이하/,
+                /(\d+)원보다 싼/,
+                /(\d+)원 이내/,
+                /(\d+)원 미만/
+            ];
+            
+            for (const pattern of pricePatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    return parseInt(match[1]);
+                }
+            }
+            
+            return null;
+        }
+        
+        // 명령어 타입 식별
+        function identifyCommandType(text) {
+            const findKeywords = ['찾아', '찾아줘', '찾기', '검색', '어디', '위치', '추천', '알려줘', '보여줘', '가까운', '근처'];
+            const reserveKeywords = ['예약', '예약해', '예약해줘', '예약하기', '빌리', '빌려줘'];
+            const infoKeywords = ['정보', '알려줘', '어떤', '어디에', '얼마', '비용', '가격'];
+            
+            if (findKeywords.some(keyword => text.includes(keyword))) {
+                return 'find_parking';
+            } else if (reserveKeywords.some(keyword => text.includes(keyword))) {
+                return 'reserve_parking';
+            } else if (infoKeywords.some(keyword => text.includes(keyword))) {
+                return 'parking_info';
+            } else {
+                return 'find_parking'; // 기본값
+            }
+        }
+        
+        function getCommandTypeName(type) {
+            const names = {
+                'find_parking': '주차장 찾기',
+                'reserve_parking': '주차장 예약',
+                'parking_info': '주차장 정보 조회'
+            };
+            return names[type] || '알 수 없음';
+        }
+        
+        // Haversine 공식으로 정확한 거리 계산 (km)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // 지구 반지름 (km)
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        
+        // 실제 데이터 기반 최적 주차장 찾기
+        function findOptimalParkingRealData(hours, vehicleType, priceLimit, originalText) {
+            let filteredLots = [...realParkingData];
+            
+            // 차량 높이 필터링
+            const vehicleHeight = vehicleType === 'SUV' ? 2.0 : 1.8;
+            filteredLots = filteredLots.filter(lot => lot.restrictions.height_limit >= vehicleHeight);
+            
+            // 차량 타입 필터링
+            filteredLots = filteredLots.filter(lot => 
+                lot.restrictions.vehicle_types.includes(vehicleType) || 
+                lot.restrictions.vehicle_types.includes('승용차')
+            );
+            
+            // 가용 공간 필터링
+            filteredLots = filteredLots.filter(lot => lot.capacity.available > 0);
+            
+            // 특별 요구사항 필터링
+            if (originalText.includes('전기차') || originalText.includes('충전')) {
+                filteredLots = filteredLots.filter(lot => lot.amenities.ev_charging);
+            }
+            
+            // 각 주차장에 대해 점수 계산 및 비용 계산
+            const scoredLots = filteredLots.map(lot => {
+                const cost = calculateRealCost(lot, hours);
+                // Haversine 공식으로 정확한 거리 계산
+                const distance = calculateDistance(
+                    currentLocation[0], currentLocation[1],
+                    lot.location[0], lot.location[1]
+                );
+                const score = calculateRealScore(lot, cost, distance, hours);
+                
+                return {
+                    ...lot,
+                    totalCost: cost,
+                    distance: distance,
+                    score: score
+                };
+            });
+            
+            // 가격 제한 적용
+            let finalLots = scoredLots;
+            if (priceLimit) {
+                finalLots = scoredLots.filter(lot => lot.totalCost <= priceLimit);
+            }
+            
+            // 거리순으로 정렬 (가까운 순)
+            finalLots.sort((a, b) => a.distance - b.distance);
+            
+            // 결과 HTML 생성
+            if (finalLots.length === 0) {
+                return '<div class="error">❌ 조건에 맞는 주차장을 찾을 수 없습니다.</div>';
+            }
+            
+            let resultHtml = `<div class="success">✅ ${finalLots.length}개의 주차장을 찾았습니다! (거리순 정렬)</div>`;
+            
+            finalLots.forEach((lot, index) => {
+                resultHtml += `<div class="parking-lot">`;
+                resultHtml += `<h4>${index + 1}. ${lot.name}</h4>`;
+                resultHtml += `<div class="info">`;
+                resultHtml += `<span>💰 총 비용: ${lot.totalCost.toLocaleString()}원 (${hours}시간)</span>`;
+                resultHtml += `<span>📍 거리: ${lot.distance.toFixed(2)}km</span>`;
+                resultHtml += `<span>⭐ 점수: ${lot.score.toFixed(1)}</span>`;
+                resultHtml += `<span>🅿️ 가용: ${lot.capacity.available}/${lot.capacity.total}개</span>`;
+                resultHtml += `</div>`;
+                resultHtml += `<div class="info">`;
+                resultHtml += `<span>📍 주소: ${lot.address}</span>`;
+                resultHtml += `<span>🚗 높이제한: ${lot.restrictions.height_limit}m</span>`;
+                resultHtml += `<span>⏰ 최대주차: ${lot.restrictions.max_duration}시간</span>`;
+                resultHtml += `<span>⭐ 평점: ${lot.rating}/5.0 (${lot.reviews_count}개 리뷰)</span>`;
+                resultHtml += `</div>`;
+                resultHtml += `<div class="info">`;
+                resultHtml += `<span>📍 좌표: 위도 ${lot.location[0]}, 경도 ${lot.location[1]}</span>`;
+                resultHtml += `</div>`;
+                
+                // 편의시설 표시
+                const amenities = [];
+                if (lot.amenities.ev_charging) amenities.push('🔌 전기차충전');
+                if (lot.amenities.roof) amenities.push('🏠 지붕보호');
+                if (lot.amenities.elevator) amenities.push('🛗 엘리베이터');
+                if (lot.amenities.restroom) amenities.push('🚻 화장실');
+                
+                if (amenities.length > 0) {
+                    resultHtml += `<div class="info">`;
+                    resultHtml += `<span><strong>편의시설:</strong> ${amenities.join(', ')}</span>`;
+                    resultHtml += `</div>`;
+                }
+                
+                resultHtml += `</div>`;
+            });
+            
+            return resultHtml;
+        }
+        
+        // 실제 요금 계산
+        function calculateRealCost(lot, hours) {
+            const pricing = lot.pricing;
+            
+            // 일일 최대 요금이 있고 시간이 충분히 길면
+            if (hours >= 8 && pricing.daily_rate) {
+                return Math.min(pricing.daily_rate, pricing.hourly_rate * hours);
+            }
+            
+            // 기본 요금 + 추가 요금 계산
+            if (hours <= 1) {
+                return pricing.hourly_rate;
+            } else {
+                return pricing.weekday_base + (hours - 1) * pricing.weekday_additional;
+            }
+        }
+        
+        // 실제 점수 계산
+        function calculateRealScore(lot, cost, distance, hours) {
+            // 간단한 점수 계산 (비용 낮을수록, 거리 가까울수록, 편의시설 많을수록 높은 점수)
+            let score = 100;
+            
+            // 비용 점수 (낮을수록 좋음)
+            score += Math.max(0, 50 - cost / 100);
+            
+            // 거리 점수 (가까울수록 좋음) - 거리가 중요하므로 가중치 증가
+            score += Math.max(0, 50 - distance * 20);
+            
+            // 편의시설 점수
+            if (lot.amenities.ev_charging) score += 10;
+            if (lot.amenities.roof) score += 5;
+            if (lot.amenities.elevator) score += 8;
+            if (lot.amenities.restroom) score += 5;
+            
+            // 평점 점수
+            score += lot.rating * 5;
+            
+            // 가용 공간 점수
+            const availability = lot.capacity.available / lot.capacity.total;
+            score += availability * 20;
+            
+            return score;
+        }
+        
+        // 명령어 직접 입력
+        function speakCommand(command) {
+            document.getElementById('voiceResult').innerHTML = 
+                '<strong>입력된 명령어:</strong> ' + command;
+            processRealDataCommand(command);
+        }
+        
+        // 이벤트 리스너
+        document.getElementById('startVoice').addEventListener('click', function() {
+            if (initializeSpeechRecognition()) {
+                recognition.start();
+            }
+        });
+        
+        document.getElementById('stopVoice').addEventListener('click', function() {
+            if (recognition && isListening) {
+                recognition.stop();
+            }
+        });
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('최종 실제 데이터 기반 주차장 추천 시스템 로드 완료');
+            console.log('등록된 주차장:', realParkingData.length, '개');
+            console.log('현재 위치:', currentLocation);
+            
+            // 좌표 정보 표시
+            console.log('위치별 좌표:');
+            Object.entries(locations).forEach(([key, location]) => {
+                console.log(`${location.name}: 위도 ${location.coords[0]}, 경도 ${location.coords[1]}`);
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -42,3 +42,4 @@ def test_vosk_installation():
 
 if __name__ == "__main__":
     test_vosk_installation()
+

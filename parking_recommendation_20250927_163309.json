@@ -1,0 +1,536 @@
+{
+  "system_info": {
+    "version": "1.0.0",
+    "features": [
+      "음성 인식",
+      "자연어 처리",
+      "고급 스코어링",
+      "지도 API 연동",
+      "실시간 추천"
+    ],
+    "last_updated": "2025-09-27 16:33:09"
+  },
+  "user_settings": {
+    "current_location": {
+      "latitude": 37.5665,
+      "longitude": 126.978,
+      "address": "서울특별시 중구 세종대로 110"
+    },
+    "vehicle_info": {
+      "height": 1.8,
+      "type": "승용차",
+      "length": 4.5,
+      "width": 1.8
+    },
+    "preferences": {
+      "price_weight": 0.4,
+      "time_weight": 0.4,
+      "convenience_weight": 0.2,
+      "max_walking_distance": 0.5
+    }
+  },
+  "request_info": {
+    "voice_command": "2시간 주차장 찾아줘",
+    "processed_at": "2025-09-27 16:33:09",
+    "processing_time_ms": 150
+  },
+  "parking_results": {
+    "parsed_command": {
+      "original_text": "2시간 주차장 찾아줘",
+      "time_info": {
+        "hours": 2,
+        "minutes": null,
+        "days": null,
+        "start_time": null,
+        "end_time": null,
+        "duration_type": "hours",
+        "raw_text": "2시간 주차장 찾아줘"
+      },
+      "command_type": "find_parking",
+      "locations": [],
+      "vehicle_types": [],
+      "price_info": {
+        "max_price": null,
+        "price_range": null,
+        "budget": null
+      },
+      "confidence": 0.7
+    },
+    "user_profile": {
+      "vehicle_height": 1.8,
+      "vehicle_type": "승용차",
+      "driving_experience": "intermediate",
+      "preferences": {
+        "price_weight": 0.4,
+        "time_weight": 0.4,
+        "convenience_weight": 0.2,
+        "max_walking_distance": 0.5
+      }
+    },
+    "total_found": 3,
+    "recommendations": [
+      {
+        "id": 1,
+        "name": "서울시청 주차장",
+        "location": {
+          "latitude": 37.5665,
+          "longitude": 126.978,
+          "address": "서울특별시 중구 세종대로 110"
+        },
+        "pricing": {
+          "hourly_rate": 1000,
+          "daily_rate": 15000,
+          "night_rate": 500
+        },
+        "capacity": {
+          "total_spaces": 300,
+          "available_spaces": 15
+        },
+        "facilities": [
+          "24시간 운영",
+          "장애인 주차공간",
+          "전기차 충전시설"
+        ],
+        "operating_hours": {
+          "weekday": "00:00-23:59",
+          "weekend": "00:00-23:59"
+        },
+        "restrictions": {
+          "max_duration": 24,
+          "vehicle_types": [
+            "승용차",
+            "SUV",
+            "승합차"
+          ],
+          "height_limit": 2.1
+        },
+        "amenities": {
+          "elevator": true,
+          "restroom": true,
+          "atm": true
+        },
+        "rating": 4.2,
+        "reviews_count": 156,
+        "driving_difficulty": {
+          "parking_type": "자주식",
+          "access_road_width": 4.5,
+          "turning_radius": 8.0,
+          "slope_angle": 5,
+          "obstacles": [
+            "없음"
+          ],
+          "lighting": "우수",
+          "security": "우수"
+        },
+        "score_info": {
+          "final_score": 58.18,
+          "cost_score": 25.0,
+          "time_score": 120.0,
+          "convenience_score": 0.9,
+          "total_cost": 2000,
+          "travel_time": 0.0,
+          "difficulty_score": 0.1,
+          "breakdown": {
+            "price_component": 10.0,
+            "time_component": 48.0,
+            "convenience_component": 0.18
+          }
+        },
+        "final_score": 58.18,
+        "total_cost": 2000,
+        "travel_time": 0.0,
+        "difficulty_level": "매우 쉬움",
+        "actual_distance_km": 0.0,
+        "actual_travel_time_minutes": 0.0,
+        "map_url": "https://map.kakao.com/link/map/37.5665,126.978",
+        "route_guidance": {
+          "start_location": {
+            "latitude": 37.5665,
+            "longitude": 126.978,
+            "address": "서울특별시 중구 세종대로 110"
+          },
+          "end_location": {
+            "latitude": 37.5665,
+            "longitude": 126.978,
+            "address": "서울특별시 중구 세종대로 110"
+          },
+          "route_info": {
+            "distance_km": 0.0,
+            "travel_time_minutes": 0.0,
+            "traffic_condition": "보통",
+            "route_type": "최단경로",
+            "api_used": "kakao",
+            "confidence": "low"
+          },
+          "turn_by_turn": [
+            "서울특별시 중구 세종대로 110에서 출발",
+            "주요 도로로 진입",
+            "서울특별시 중구 세종대로 110 도착"
+          ],
+          "alternative_routes": [
+            {
+              "route_type": "최단경로",
+              "distance_km": 0.0,
+              "travel_time_minutes": 0.0
+            }
+          ],
+          "traffic_alerts": [],
+          "toll_info": {
+            "has_toll": false,
+            "toll_cost": 0
+          }
+        }
+      },
+      {
+        "id": 2,
+        "name": "명동 중앙 주차장",
+        "location": {
+          "latitude": 37.5636,
+          "longitude": 126.9826,
+          "address": "서울특별시 중구 명동길 26"
+        },
+        "pricing": {
+          "hourly_rate": 1500,
+          "daily_rate": 20000,
+          "night_rate": 800
+        },
+        "capacity": {
+          "total_spaces": 200,
+          "available_spaces": 8
+        },
+        "facilities": [
+          "24시간 운영",
+          "장애인 주차공간",
+          "발렛파킹"
+        ],
+        "operating_hours": {
+          "weekday": "06:00-23:00",
+          "weekend": "08:00-22:00"
+        },
+        "restrictions": {
+          "max_duration": 12,
+          "vehicle_types": [
+            "승용차",
+            "SUV"
+          ],
+          "height_limit": 2.0
+        },
+        "amenities": {
+          "elevator": true,
+          "restroom": true,
+          "atm": true
+        },
+        "rating": 4.5,
+        "reviews_count": 89,
+        "driving_difficulty": {
+          "parking_type": "발렛파킹",
+          "access_road_width": 3.0,
+          "turning_radius": 6.0,
+          "slope_angle": 0,
+          "obstacles": [
+            "없음"
+          ],
+          "lighting": "양호",
+          "security": "우수"
+        },
+        "score_info": {
+          "final_score": 30.787,
+          "cost_score": 16.667,
+          "time_score": 60.0,
+          "convenience_score": 0.6,
+          "total_cost": 3000,
+          "travel_time": 2.0,
+          "difficulty_score": 0.4,
+          "breakdown": {
+            "price_component": 6.667,
+            "time_component": 24.0,
+            "convenience_component": 0.12
+          }
+        },
+        "final_score": 30.787,
+        "total_cost": 3000,
+        "travel_time": 2.0,
+        "difficulty_level": "쉬움",
+        "actual_distance_km": 0.52,
+        "actual_travel_time_minutes": 1.0,
+        "map_url": "https://map.kakao.com/link/map/37.5636,126.9826",
+        "route_guidance": {
+          "start_location": {
+            "latitude": 37.5665,
+            "longitude": 126.978,
+            "address": "서울특별시 중구 세종대로 110"
+          },
+          "end_location": {
+            "latitude": 37.5636,
+            "longitude": 126.9826,
+            "address": "서울특별시 중구 명동길 26"
+          },
+          "route_info": {
+            "distance_km": 0.52,
+            "travel_time_minutes": 1.0,
+            "traffic_condition": "보통",
+            "route_type": "최단경로",
+            "api_used": "kakao",
+            "confidence": "low"
+          },
+          "turn_by_turn": [
+            "서울특별시 중구 세종대로 110에서 출발",
+            "주요 도로로 진입",
+            "서울특별시 중구 명동길 26 도착"
+          ],
+          "alternative_routes": [
+            {
+              "route_type": "최단경로",
+              "distance_km": 0.52,
+              "travel_time_minutes": 1.0
+            }
+          ],
+          "traffic_alerts": [],
+          "toll_info": {
+            "has_toll": false,
+            "toll_cost": 0
+          }
+        }
+      },
+      {
+        "id": 3,
+        "name": "강남역 지하 주차장",
+        "location": {
+          "latitude": 37.4979,
+          "longitude": 127.0276,
+          "address": "서울특별시 강남구 강남대로 396"
+        },
+        "pricing": {
+          "hourly_rate": 2000,
+          "daily_rate": 25000,
+          "night_rate": 1000
+        },
+        "capacity": {
+          "total_spaces": 500,
+          "available_spaces": 25
+        },
+        "facilities": [
+          "24시간 운영",
+          "장애인 주차공간",
+          "전기차 충전시설",
+          "무료 WiFi"
+        ],
+        "operating_hours": {
+          "weekday": "05:30-24:00",
+          "weekend": "06:00-23:30"
+        },
+        "restrictions": {
+          "max_duration": 48,
+          "vehicle_types": [
+            "승용차",
+            "SUV",
+            "승합차",
+            "화물차"
+          ],
+          "height_limit": 2.3
+        },
+        "amenities": {
+          "elevator": true,
+          "restroom": true,
+          "convenience_store": true,
+          "atm": true
+        },
+        "rating": 4.7,
+        "reviews_count": 234,
+        "driving_difficulty": {
+          "parking_type": "기계식",
+          "access_road_width": 3.5,
+          "turning_radius": 7.0,
+          "slope_angle": 8,
+          "obstacles": [
+            "기둥",
+            "화분"
+          ],
+          "lighting": "우수",
+          "security": "우수"
+        },
+        "score_info": {
+          "final_score": 6.552,
+          "cost_score": 12.5,
+          "time_score": 3.81,
+          "convenience_score": 0.14,
+          "total_cost": 4000,
+          "travel_time": 31.5,
+          "difficulty_score": 0.86,
+          "breakdown": {
+            "price_component": 5.0,
+            "time_component": 1.524,
+            "convenience_component": 0.028
+          }
+        },
+        "final_score": 6.552,
+        "total_cost": 4000,
+        "travel_time": 31.5,
+        "difficulty_level": "매우 어려움",
+        "actual_distance_km": 8.79,
+        "actual_travel_time_minutes": 17.6,
+        "map_url": "https://map.kakao.com/link/map/37.4979,127.0276",
+        "route_guidance": {
+          "start_location": {
+            "latitude": 37.5665,
+            "longitude": 126.978,
+            "address": "서울특별시 중구 세종대로 110"
+          },
+          "end_location": {
+            "latitude": 37.4979,
+            "longitude": 127.0276,
+            "address": "서울특별시 강남구 강남대로 396"
+          },
+          "route_info": {
+            "distance_km": 8.79,
+            "travel_time_minutes": 17.6,
+            "traffic_condition": "보통",
+            "route_type": "최단경로",
+            "api_used": "kakao",
+            "confidence": "low"
+          },
+          "turn_by_turn": [
+            "서울특별시 중구 세종대로 110에서 출발",
+            "주요 도로로 진입",
+            "서울특별시 강남구 강남대로 396 도착"
+          ],
+          "alternative_routes": [
+            {
+              "route_type": "최단경로",
+              "distance_km": 8.79,
+              "travel_time_minutes": 17.6
+            }
+          ],
+          "traffic_alerts": [],
+          "toll_info": {
+            "has_toll": false,
+            "toll_cost": 0
+          }
+        }
+      }
+    ],
+    "route_guidance": [
+      {
+        "lot_id": 1,
+        "lot_name": "서울시청 주차장",
+        "route": {
+          "start_location": {
+            "latitude": 37.5665,
+            "longitude": 126.978,
+            "address": "서울특별시 중구 세종대로 110"
+          },
+          "end_location": {
+            "latitude": 37.5665,
+            "longitude": 126.978,
+            "address": "서울특별시 중구 세종대로 110"
+          },
+          "route_info": {
+            "distance_km": 0.0,
+            "estimated_time_minutes": 0.0,
+            "traffic_condition": "보통",
+            "toll_roads": [],
+            "route_summary": "서울특별시 중구 세종대로 110 → 서울특별시 중구 세종대로 110"
+          },
+          "turn_by_turn": [
+            "현재 위치에서 출발",
+            "주요 도로로 진입",
+            "서울시청 주차장 도착"
+          ]
+        }
+      },
+      {
+        "lot_id": 2,
+        "lot_name": "명동 중앙 주차장",
+        "route": {
+          "start_location": {
+            "latitude": 37.5665,
+            "longitude": 126.978,
+            "address": "서울특별시 중구 세종대로 110"
+          },
+          "end_location": {
+            "latitude": 37.5636,
+            "longitude": 126.9826,
+            "address": "서울특별시 중구 명동길 26"
+          },
+          "route_info": {
+            "distance_km": 1.0,
+            "estimated_time_minutes": 2.0,
+            "traffic_condition": "보통",
+            "toll_roads": [],
+            "route_summary": "서울특별시 중구 세종대로 110 → 서울특별시 중구 명동길 26"
+          },
+          "turn_by_turn": [
+            "현재 위치에서 출발",
+            "주요 도로로 진입",
+            "명동 중앙 주차장 도착"
+          ]
+        }
+      },
+      {
+        "lot_id": 3,
+        "lot_name": "강남역 지하 주차장",
+        "route": {
+          "start_location": {
+            "latitude": 37.5665,
+            "longitude": 126.978,
+            "address": "서울특별시 중구 세종대로 110"
+          },
+          "end_location": {
+            "latitude": 37.4979,
+            "longitude": 127.0276,
+            "address": "서울특별시 강남구 강남대로 396"
+          },
+          "route_info": {
+            "distance_km": 15.8,
+            "estimated_time_minutes": 31.5,
+            "traffic_condition": "보통",
+            "toll_roads": [],
+            "route_summary": "서울특별시 중구 세종대로 110 → 서울특별시 강남구 강남대로 396"
+          },
+          "turn_by_turn": [
+            "현재 위치에서 출발",
+            "주요 도로로 진입",
+            "강남역 지하 주차장 도착"
+          ]
+        }
+      }
+    ],
+    "processing_info": {
+      "scoring_method": "advanced_weighted_scoring",
+      "weights_used": {
+        "price_weight": 0.4,
+        "time_weight": 0.4,
+        "convenience_weight": 0.2,
+        "max_walking_distance": 0.5
+      },
+      "filters_applied": [
+        "차량 높이: 1.8m 이하",
+        "차량 타입: 승용차",
+        "운영 시간: 현재 운영 중",
+        "가용성: 빈 자리 있음"
+      ]
+    }
+  },
+  "summary": {
+    "status": "success",
+    "total_found": 3,
+    "best_recommendation": {
+      "name": "서울시청 주차장",
+      "cost": 2000,
+      "distance": 0.0,
+      "travel_time": 0.0,
+      "score": 58.18,
+      "difficulty": "매우 쉬움"
+    },
+    "price_range": {
+      "min": 2000,
+      "max": 4000,
+      "avg": 3000.0
+    },
+    "time_range": {
+      "min": 0.0,
+      "max": 17.6,
+      "avg": 6.2
+    }
+  }
+}

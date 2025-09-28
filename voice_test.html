@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vosk 음성인식 테스트</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid #4CAF50;
+        }
+        
+        .status.error {
+            background: rgba(244, 67, 54, 0.3);
+            border: 1px solid #F44336;
+        }
+        
+        .status.info {
+            background: rgba(33, 150, 243, 0.3);
+            border: 1px solid #2196F3;
+        }
+        
+        .result-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            min-height: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .test-commands {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .command-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 4px solid #4ECDC4;
+        }
+        
+        .debug-info {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Vosk 음성인식 테스트</h1>
+        
+        <div class="test-section">
+            <h2>1. 브라우저 음성 인식 테스트</h2>
+            <p>크롬 브라우저의 내장 음성 인식 API를 사용합니다.</p>
+            
+            <button id="startBrowserRecognition">🎤 브라우저 음성인식 시작</button>
+            <button id="stopBrowserRecognition" disabled>⏹️ 중지</button>
+            
+            <div id="browserStatus" class="status info">
+                준비됨 - 시작 버튼을 클릭하세요
+            </div>
+            
+            <div id="browserResult" class="result-box">
+                인식된 텍스트가 여기에 표시됩니다...
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>2. 테스트 명령어</h2>
+            <p>다음 명령어들을 말해보세요:</p>
+            
+            <div class="test-commands">
+                <div class="command-item">"2시간동안 주차할 주차장 찾아줘"</div>
+                <div class="command-item">"3시간 주차장 예약해줘"</div>
+                <div class="command-item">"주차장 정보 알려줘"</div>
+                <div class="command-item">"1시간 주차할 곳 찾아줘"</div>
+                <div class="command-item">"주차장 추천해줘"</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>3. 디버그 정보</h2>
+            <div id="debugInfo" class="debug-info">
+                <div>브라우저: <span id="browserInfo"></span></div>
+                <div>음성 인식 지원: <span id="speechSupport"></span></div>
+                <div>마이크 권한: <span id="micPermission"></span></div>
+                <div>현재 시간: <span id="currentTime"></span></div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>4. Vosk 연결 테스트</h2>
+            <button id="testVoskConnection">🔗 Vosk 서버 연결 테스트</button>
+            <div id="voskStatus" class="status info">
+                Vosk 서버 연결을 테스트하려면 버튼을 클릭하세요
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 브라우저 정보 표시
+        document.getElementById('browserInfo').textContent = navigator.userAgent;
+        const speechSupported = 'speechRecognition' in window || 'webkitSpeechRecognition' in window;
+        document.getElementById('speechSupport').textContent = speechSupported ? '✅ 지원' : '❌ 미지원';
+        document.getElementById('currentTime').textContent = new Date().toLocaleString();
+        
+        // 디버그 정보 추가
+        console.log('브라우저:', navigator.userAgent);
+        console.log('음성 인식 지원:', speechSupported);
+        console.log('HTTPS:', location.protocol === 'https:');
+        
+        // 음성 인식 객체
+        let recognition = null;
+        let isListening = false;
+        
+        // 브라우저 음성 인식 초기화
+        if ('speechRecognition' in window || 'webkitSpeechRecognition' in window) {
+            const SpeechRecognition = window.speechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'ko-KR';
+            
+            recognition.onstart = function() {
+                document.getElementById('browserStatus').className = 'status success';
+                document.getElementById('browserStatus').textContent = '🎤 음성 인식 중... 말씀하세요!';
+                document.getElementById('startBrowserRecognition').disabled = true;
+                document.getElementById('stopBrowserRecognition').disabled = false;
+                isListening = true;
+            };
+            
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                document.getElementById('browserResult').innerHTML = 
+                    '<strong>최종 결과:</strong> ' + finalTranscript + 
+                    '<br><em>실시간:</em> ' + interimTranscript;
+                
+                // 주차장 관련 명령어 감지
+                if (finalTranscript.includes('주차') || finalTranscript.includes('주차장')) {
+                    document.getElementById('browserResult').style.border = '2px solid #4CAF50';
+                    document.getElementById('browserResult').innerHTML += 
+                        '<br><span style="color: #4CAF50;">✅ 주차장 관련 명령어 감지됨!</span>';
+                }
+            };
+            
+            recognition.onerror = function(event) {
+                document.getElementById('browserStatus').className = 'status error';
+                document.getElementById('browserStatus').textContent = '❌ 오류: ' + event.error;
+                resetButtons();
+            };
+            
+            recognition.onend = function() {
+                document.getElementById('browserStatus').className = 'status info';
+                document.getElementById('browserStatus').textContent = '음성 인식이 종료되었습니다';
+                resetButtons();
+            };
+        }
+        
+        function resetButtons() {
+            document.getElementById('startBrowserRecognition').disabled = false;
+            document.getElementById('stopBrowserRecognition').disabled = true;
+            isListening = false;
+        }
+        
+        // 이벤트 리스너
+        document.getElementById('startBrowserRecognition').addEventListener('click', function() {
+            console.log('버튼 클릭됨');
+            if (!recognition) {
+                alert('음성 인식을 지원하지 않는 브라우저입니다. 크롬을 사용해주세요.');
+                return;
+            }
+            if (!isListening) {
+                try {
+                    recognition.start();
+                    console.log('음성 인식 시작됨');
+                } catch (error) {
+                    console.error('음성 인식 시작 실패:', error);
+                    alert('음성 인식 시작에 실패했습니다: ' + error.message);
+                }
+            }
+        });
+        
+        document.getElementById('stopBrowserRecognition').addEventListener('click', function() {
+            if (recognition && isListening) {
+                recognition.stop();
+            }
+        });
+        
+        // 마이크 권한 확인
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function() {
+                    document.getElementById('micPermission').textContent = '✅ 허용됨';
+                    document.getElementById('micPermission').style.color = '#4CAF50';
+                })
+                .catch(function() {
+                    document.getElementById('micPermission').textContent = '❌ 거부됨';
+                    document.getElementById('micPermission').style.color = '#F44336';
+                });
+        } else {
+            document.getElementById('micPermission').textContent = '❓ 확인 불가';
+        }
+        
+        // Vosk 연결 테스트
+        document.getElementById('testVoskConnection').addEventListener('click', function() {
+            document.getElementById('voskStatus').className = 'status info';
+            document.getElementById('voskStatus').textContent = '🔄 Vosk 서버 연결 테스트 중...';
+            
+            // 실제 Vosk 서버가 있다면 여기서 연결 테스트
+            // 현재는 시뮬레이션
+            setTimeout(function() {
+                document.getElementById('voskStatus').className = 'status success';
+                document.getElementById('voskStatus').textContent = '✅ Vosk 서버 연결 성공! (시뮬레이션)';
+            }, 2000);
+        });
+        
+        // 키보드 단축키
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Space' && !isListening) {
+                event.preventDefault();
+                document.getElementById('startBrowserRecognition').click();
+            } else if (event.code === 'Escape' && isListening) {
+                event.preventDefault();
+                document.getElementById('stopBrowserRecognition').click();
+            }
+        });
+        
+        // 자동 새로고침 (디버그용)
+        setInterval(function() {
+            document.getElementById('currentTime').textContent = new Date().toLocaleString();
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>카카오맵 테스트</title>
+</head>
+<body>
+    <h1>카카오맵 API 테스트</h1>
+    <div id="map" style="width:100%;height:400px;"></div>
+    
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2f6c4e6c906b95514bf1690a4efc328b"></script>
+    <script>
+        var container = document.getElementById('map');
+        var options = {
+            center: new kakao.maps.LatLng(37.5442, 127.0778),
+            level: 3
+        };
+        var map = new kakao.maps.Map(container, options);
+        
+        // 마커 추가
+        var marker = new kakao.maps.Marker({
+            position: new kakao.maps.LatLng(37.5442, 127.0778)
+        });
+        marker.setMap(map);
+    </script>
+</body>
+</html>
