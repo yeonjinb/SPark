@@ -1,5 +1,26 @@
 # Vosk 음성인식 사용법 가이드
 
+## 🎤 Vosk 모델 설치 방법
+
+GitHub에서 클론한 후 별도로 Vosk 모델을 다운로드해야 합니다:
+
+```bash
+# 1. models 폴더 생성
+mkdir models
+cd models
+
+# 2. 한국어 모델 다운로드 (173MB)
+wget https://alphacephei.com/vosk/models/vosk-model-small-ko-0.22.zip
+
+# 3. 압축 해제
+unzip vosk-model-small-ko-0.22.zip
+
+# 4. 폴더명 확인
+ls vosk-model-small-ko-0.22/
+```
+
+**주의**: Vosk 모델 파일은 용량이 커서 Git에 포함되지 않습니다.
+
 ## 📚 목차
 1. [기본 사용법](#기본-사용법)
 2. [실시간 음성인식](#실시간-음성인식)
