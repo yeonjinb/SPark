@@ -192,9 +192,6 @@
             recognition.interimResults = true;
             recognition.lang = 'ko-KR';
             
-            // 노이즈 제거 설정
-            recognition.maxAlternatives = 1;  // 최상위 결과만 사용
-            
             recognition.onstart = function() {
                 document.getElementById('browserStatus').className = 'status success';
                 document.getElementById('browserStatus').textContent = '🎤 음성 인식 중... 말씀하세요!';

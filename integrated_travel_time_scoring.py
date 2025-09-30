@@ -548,3 +548,10 @@ if __name__ == "__main__":
               f"시간 {score_result['travel_time_info']['total_time_minutes']:.1f}분")
 
 
+
+
+
+
+
+
+

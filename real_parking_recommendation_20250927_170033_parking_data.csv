@@ -1,0 +1,4 @@
+name,address,latitude,longitude,distance_km,walking_time_min,total_spots,available_spots,base_fee,unit_fee,unit_time,max_fee,free_time,operation_start,operation_end,weekend_operation,height_limit,weight_limit,facilities,payment_methods,total_score,price_score,distance_score,availability_score,convenience_score,estimated_cost,discount_applied,final_cost
+능동공영 주차장,,0,0,0,0,0,0,0,0,0,0,0,,,True,0,0,"24시간 운영, 전기차 충전, 지붕 보호",,0,0,0,0,0,0,0,0
+서울시청 주차장,,0,0,0,0,0,0,0,0,0,0,0,,,True,0,0,"24시간 운영, 장애인 주차공간, 전기차 충전시설",,0,0,0,0,0,0,0,0
+명동 중앙 주차장,,0,0,0,0,0,0,0,0,0,0,0,,,True,0,0,"24시간 운영, 장애인 주차공간, 발렛파킹",,0,0,0,0,0,0,0,0

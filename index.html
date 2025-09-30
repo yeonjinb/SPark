@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0;url=spark_final_algorithm.html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPARK - 스마트 주차장 추천 시스템</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+            text-align: center;
+        }
+        .loading-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+        .loading-dots {
+            font-size: 1.5rem;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.5; }
+        }
+        .manual-link {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        .manual-link a {
+            color: #ffeb3b;
+            text-decoration: none;
+        }
+        .manual-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="logo">🅿️</div>
+        <div class="title">SPARK</div>
+        <div class="subtitle">스마트 주차장 추천 시스템</div>
+        <div class="loading-dots">로딩 중...</div>
+        <div class="manual-link">
+            자동으로 이동되지 않으면 <a href="spark_final_algorithm.html">여기를 클릭하세요</a>
+        </div>
+    </div>
+
+    <script>
+        // 1초 후 자동 리다이렉트 (사용자가 로딩 화면을 볼 수 있도록)
+        setTimeout(function() {
+            window.location.href = 'spark_final_algorithm.html';
+        }, 1000);
+    </script>
+</body>
+</html>
+
+
+
+
+
+

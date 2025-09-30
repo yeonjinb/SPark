@@ -523,6 +523,55 @@ where pl.name in ('건국대병원주차장');
 create index if not exists idx_parking_discounts_lot on public.parking_discounts (parking_lot_id);
 create index if not exists idx_parking_discounts_type on public.parking_discounts (discount_type);
 
+-- Create monthly pass table for parking lots
+create table if not exists public.monthly_passes (
+  id uuid primary key default gen_random_uuid(),
+  parking_lot_id uuid not null references public.parking_lots(id) on delete cascade,
+  pass_type text not null check (pass_type in ('MONTHLY', 'QUARTERLY', 'YEARLY')),
+  price int not null check (price > 0), -- 정기권 가격 (원)
+  description text,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  unique(parking_lot_id, pass_type)
+);
+
+-- Insert monthly pass data for public parking lots with realistic pricing
+insert into public.monthly_passes (parking_lot_id, pass_type, price, description) 
+select 
+  pl.id,
+  'MONTHLY',
+  price,
+  description
+from public.parking_lots pl,
+(values
+  ('능동공영',NULL,'월정기권(공영할인)')
+  ('자양전통시장 공영',50000, '월정기권 (공영할인)'),
+  ('화양동 공영', 100000, '월정기권 (공영할인)'),
+  ('자양유수지 공영주차장', 100000, '월정기권 (공영할인)'),
+  ('광진정보도서관 주차장', 90000, '월정기권 (도서관할인)'),
+  ('어린이대공원 정문 주차장', 100000, '월정기권 (공원할인)'),
+  ('어린이대공원 후문 주차장', 100000, '월정기권 (공원할인)'),
+  ('자양4동 공영주차장',130000,'월정기권(공영할인)'),
+  ('광진광장',NULL,'월정기권(공영할인)'),
+  ('송림 기사식당길 공영주차장(구)',90000,'월정기권(공영할인)')
+  ('송림기사식당길(B) 공영주차장',90000,'월정기권(공영할인)')  
+  ('건국대병원주차장',110000,'월정기권(병원할인)'),
+  ('한림타워민영주차장',NULL,'월정기권(민영할인)'),
+  ('건국대서울캠퍼스주차장',110000,'월정기권(대학교할인)'),
+  ('스타시티주차장',NULL,'월정기권(프리미엄할인)'),
+  ('한아름민영주차장',99000,'월정기권(민영할인)'),
+  ('동신민영주차장',NULL,'월정기권(민영할인)'),
+  ('아이파킹 동도센트리움캠퍼스파크 주차장',99000,'월정기권(프리미엄할인)')
+
+
+) as passes(parking_name, price, description)
+where pl.name = passes.parking_name;
+
+-- Create indexes for monthly pass queries
+create index if not exists idx_monthly_passes_lot on public.monthly_passes (parking_lot_id);
+create index if not exists idx_monthly_passes_type on public.monthly_passes (pass_type);
+create index if not exists idx_monthly_passes_active on public.monthly_passes (is_active) where is_active = true;
+
 -- Summary of inserted data:
 /*
 INSERTED PARKING LOT DATA (20 locations):

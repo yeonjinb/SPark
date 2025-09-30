@@ -310,6 +310,90 @@
         .parking-card.beta::before { background: var(--secondary-color); }
         .parking-card.gamma::before { background: var(--success-color); }
 
+        .criteria-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .criteria-tag {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .criteria-tag.optimal {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #8B4513;
+        }
+
+        .criteria-tag.cheapest {
+            background: linear-gradient(135deg, #4CAF50, #45A049);
+            color: white;
+        }
+
+        .criteria-tag.nearest {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .monthly-pass-notice {
+            background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+            border: 2px solid #2196F3;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+        }
+
+        .monthly-pass-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .monthly-pass-content {
+            flex: 1;
+        }
+
+        .monthly-pass-title {
+            font-weight: 700;
+            color: #1976D2;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .monthly-pass-details {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .monthly-price {
+            font-weight: 600;
+            color: #1976D2;
+            font-size: 1rem;
+        }
+
+        .monthly-savings {
+            color: #4CAF50;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .monthly-pass-message {
+            color: #1565C0;
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
         .parking-header {
             display: flex;
             justify-content: space-between;
@@ -519,7 +603,7 @@
                     <button class="quick-btn" onclick="quickSearchEV(2)">
                         🔌<br><span>전기차<br>2시간</span>
                     </button>
-                    <button class="quick-btn" onclick="quickSearch(8)">
+                    <button class="quick-btn" onclick="quickSearch(24)">
                         🕘<br><span>하루종일</span>
                     </button>
                 </div>
@@ -591,7 +675,7 @@
                 </div>
 
                 <!-- Kakao Map Container -->
-                <div id="map" style="width: 500px;height: 400px; border-radius: 12px; margin: 20px 0;"></div>
+                <div id="map" style="height: 400px; border-radius: 12px; margin: 20px 0;"></div>
                 
                 <!-- Location Status -->
                 <div id="locationStatus" style="margin: 10px 0;"></div>
@@ -613,8 +697,44 @@
         </div>
     </div>
 
-    <!-- 카카오맵 API -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2f6c4e6c906b95514bf1690a4efc328b"></script>
+    <!-- 카카오맵 API - async 로딩으로 변경 -->
+    <script>
+        window.kakaoMapAPIKey = '2f6c4e6c906b95514bf1690a4efc328b';
+        
+        // 카카오맵 API 동적 로딩 (document.write 차단 문제 해결)
+        function loadKakaoMapAPI() {
+            return new Promise((resolve, reject) => {
+                console.log('🚀 카카오맵 API 동적 로딩 시작...');
+                
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${window.kakaoMapAPIKey}&libraries=services&autoload=false`;
+                script.async = true;
+                
+                script.onload = function() {
+                    console.log('✅ 카카오맵 API 스크립트 로드 완료');
+                    
+                    // kakao.maps.load를 사용하여 API 초기화
+                    if (window.kakao && window.kakao.maps) {
+                        window.kakao.maps.load(function() {
+                            console.log('✅ 카카오맵 API 초기화 완료');
+                            resolve();
+                        });
+                    } else {
+                        console.error('❌ 카카오맵 객체를 찾을 수 없음');
+                        reject(new Error('카카오맵 객체 없음'));
+                    }
+                };
+                
+                script.onerror = function() {
+                    console.error('❌ 카카오맵 API 스크립트 로드 실패');
+                    reject(new Error('카카오맵 API 로드 실패'));
+                };
+                
+                document.head.appendChild(script);
+            });
+        }
+    </script>
     
     <script>
         // 전역 변수
@@ -1072,33 +1192,10 @@
             gamma: { alpha: 0.2, beta: 0.2, gamma: 0.6 }
         };
 
-        // 기본 위치 (광진구 중앙)
-        const baseLocation = {
-            lat: 37.5442,
-            lng: 127.0778,
-            address: "광진구 중앙"
-        };
+        // 중복 제거됨 - 아래쪽에 통일된 위치 정보가 있음
 
         // 카카오맵 초기화
-        function initializeKakaoMap() {
-            const mapContainer = document.getElementById('map');
-            const mapOption = {
-                center: new kakao.maps.LatLng(baseLocation.lat, baseLocation.lng),
-                level: 5
-            };
-
-            map = new kakao.maps.Map(mapContainer, mapOption);
-            
-            // 줌 컨트롤 추가
-            const zoomControl = new kakao.maps.ZoomControl();
-            map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
-
-            // 지도 타입 컨트롤 추가
-            const mapTypeControl = new kakao.maps.MapTypeControl();
-            map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
-
-            console.log('카카오맵이 초기화되었습니다.');
-        }
+        // 중복 함수 제거됨 - 아래쪽에 완전한 함수가 있음
 
         // 사용자 현재 위치 가져오기
         function getCurrentLocation() {
@@ -1546,24 +1643,125 @@
             }
         }
 
-        // 시간 추출
+        // 시간 추출 (Vosk 인식 결과 최적화)
         function extractHours(text) {
+            console.log('시간 추출 대상 텍스트:', text);
+            
+            // 일/날 단위 키워드 처리 (확장)
+            const dayPatterns = [
+                // 하루 관련
+                { regex: /하루종일|하루 종일|종일|하루|하루 동안|하루동안|하루간|하루 간|하루치/, hours: 24 },
+                { regex: /24시간/, hours: 24 },
+                
+                // 이틀/2일 관련  
+                { regex: /이틀|이틀간|이틀 간|이틀동안|이틀 동안/, hours: 48 },
+                { regex: /2일|2일간|2일 간|2일동안|2일 동안/, hours: 48 },
+                { regex: /48시간/, hours: 48 },
+                
+                // 3일 관련
+                { regex: /사흘|3일|3일간|3일 간|3일동안|3일 동안/, hours: 72 },
+                { regex: /72시간/, hours: 72 },
+                
+                // 4일 관련
+                { regex: /나흘|4일|4일간|4일 간|4일동안|4일 동안/, hours: 96 },
+                { regex: /96시간/, hours: 96 },
+                
+                // 5일 관련
+                { regex: /닷새|5일|5일간|5일 간|5일동안|5일 동안/, hours: 120 },
+                { regex: /120시간/, hours: 120 },
+                
+                // 일주일 관련
+                { regex: /일주일|1주일|주일|7일|7일간|7일 간|7일동안|7일 동안/, hours: 168 },
+                { regex: /168시간/, hours: 168 },
+                
+                // 2주일 관련
+                { regex: /이주일|2주일|2주|14일|14일간|14일 간/, hours: 336 },
+                { regex: /336시간/, hours: 336 }
+            ];
+            
+            // 일/날 단위 패턴 확인
+            for (const pattern of dayPatterns) {
+                if (pattern.regex.test(text)) {
+                    console.log(`일/날 단위 감지: ${text} → ${pattern.hours}시간`);
+                    return pattern.hours;
+                }
+            }
+            
+            // 아라비아 숫자 + 일/날 패턴 (1일~14일)
+            const numberDayPatterns = [
+                /(\d+)일간?/,
+                /(\d+)일 간?/,
+                /(\d+)일동안/,
+                /(\d+)일 동안/,
+                /(\d+)날/
+            ];
+            
+            for (const pattern of numberDayPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    const days = parseInt(match[1]);
+                    if (days >= 1 && days <= 14) { // 최대 2주일까지
+                        const hours = days * 24;
+                        console.log(`숫자+일 감지: ${days}일 → ${hours}시간`);
+                        return hours;
+                    }
+                }
+            }
+            
+            // 한글 숫자 매핑 (확장)
+            const koreanNumbers = {
+                '한': 1, '두': 2, '세': 3, '네': 4, '다섯': 5,
+                '여섯': 6, '일곱': 7, '여덟': 8, '아홉': 9, '열': 10,
+                '열한': 11, '열두': 12, '열세': 13, '열네': 14, '열다섯': 15,
+                '열여섯': 16, '열일곱': 17, '열여덟': 18, '열아홉': 19, '스무': 20,
+                '스물한': 21, '스물두': 22, '스물세': 23, '스물네': 24,
+                '일': 1, '이': 2, '삼': 3, '사': 4, '오': 5,
+                '육': 6, '칠': 7, '팔': 8, '구': 9
+            };
+            
+            // 한글 숫자 + 시간 처리 (확장)
+            for (const [korean, number] of Object.entries(koreanNumbers)) {
+                const timePatterns = [
+                    `${korean}시간`,
+                    `${korean} 시간`,
+                    `${korean}시간동안`,
+                    `${korean}시간 동안`
+                ];
+                
+                for (const pattern of timePatterns) {
+                    if (text.includes(pattern)) {
+                        console.log(`한글 숫자 감지: ${pattern} → ${number}시간`);
+                        return number;
+                    }
+                }
+            }
+            
+            // 아라비아 숫자 + 시간 패턴 (확장)
             const hourPatterns = [
                 /(\d+)시간/,
                 /(\d+)시간동안/,
-                /(\d+)시간 동안/
+                /(\d+)시간 동안/,
+                /(\d+)시간간/,
+                /(\d+)시간 간/,
+                /(\d+)시간치/,
+                /(\d+)시간 치/,
+                /(\d+)h/i,
+                /(\d+)hr/i,
+                /(\d+)hour/i
             ];
             
             for (const pattern of hourPatterns) {
                 const match = text.match(pattern);
                 if (match) {
                     const hours = parseInt(match[1]);
-                    if (hours >= 1 && hours <= 24) {
+                    if (hours >= 1 && hours <= 336) { // 최대 2주일(336시간)까지
+                        console.log(`아라비아 숫자 감지: ${hours}시간`);
                         return hours;
                     }
                 }
             }
             
+            console.log('시간 추출 실패 → 기본값 2시간');
             return 2; // 기본값
         }
 
@@ -1796,7 +1994,7 @@
                                 style="margin-top: 5px; padding: 3px 8px; font-size: 10px; 
                                        background: #007bff; color: white; border: none; 
                                        border-radius: 3px; cursor: pointer;">
-                            🧭 길찾기
+                            🚗 자동차길찾기
                         </button>
                     </div>
                 `;
@@ -1874,6 +2072,69 @@
             }
         }
 
+        // 한달 정기권 비교 함수 (DB의 monthly_pass 정보 참고)
+        function checkMonthlyPassRecommendation(lot, totalCost) {
+            // DB에서 실제 monthly_pass 정보를 확인
+            const monthlyPassInfo = getMonthlyPassFromDB(lot.name);
+            if (!monthlyPassInfo || !monthlyPassInfo.price) return null;
+            
+            // 한달 정기권이 더 저렴한지 확인
+            if (totalCost > monthlyPassInfo.price) {
+                return {
+                    isRecommended: true,
+                    monthlyPrice: monthlyPassInfo.price,
+                    savings: totalCost - monthlyPassInfo.price,
+                    description: monthlyPassInfo.description || '한달 정기권'
+                };
+            }
+            return null;
+        }
+
+        // DB에서 monthly_pass 정보 가져오기 (실제 구현 시 API 호출)
+        function getMonthlyPassFromDB(parkingName) {
+            // schema_improved.sql의 최신 monthly_passes 테이블 데이터 반영
+            // NULL 값은 정기권 정보가 없는 주차장
+            
+            const monthlyPassData = {
+                '자양전통시장 공영': { price: 50000, description: '월정기권 (공영할인)' },
+                '화양동 공영': { price: 100000, description: '월정기권 (공영할인)' },
+                '자양유수지 공영주차장': { price: 100000, description: '월정기권 (공영할인)' },
+                '광진정보도서관 주차장': { price: 90000, description: '월정기권 (도서관할인)' },
+                '어린이대공원 정문 주차장': { price: 100000, description: '월정기권 (공원할인)' },
+                '어린이대공원 후문 주차장': { price: 100000, description: '월정기권 (공원할인)' },
+                '자양4동 공영주차장': { price: 130000, description: '월정기권(공영할인)' },
+                '송림 기사식당길 공영주차장': { price: 90000, description: '월정기권(공영할인)' },
+                '송림기사식당길(B) 공영주차장': { price: 90000, description: '월정기권(공영할인)' },
+                '건국대병원주차장': { price: 110000, description: '월정기권(병원할인)' },
+                '건국대서울캠퍼스주차장': { price: 110000, description: '월정기권(대학교할인)' },
+                '한아름민영주차장': { price: 99000, description: '월정기권(민영할인)' },
+                '아이파킹 동도센트리움캠퍼스파크 주차장': { price: 99000, description: '월정기권(프리미엄할인)' }
+                // 능동공영, 광진광장, 한림타워민영, 스타시티, 동신민영은 NULL (정기권 정보 없음)
+            };
+            
+            return monthlyPassData[parkingName] || null;
+            
+            // 향후 실제 API 구현:
+            /*
+            const response = await fetch(`/api/parking/${encodeURIComponent(parkingName)}/monthly-pass`);
+            if (response.ok) {
+                const data = await response.json();
+                return data.monthly_pass || null;
+            }
+            return null;
+            */
+        }
+
+        // 추천 기준 정보 생성
+        function getRecommendationCriteria(results) {
+            if (!results || results.length === 0) return '';
+            
+            const cheapest = results.reduce((min, lot) => lot.totalCost < min.totalCost ? lot : min, results[0]);
+            const nearest = results.reduce((min, lot) => lot.distance < min.distance ? lot : min, results[0]);
+            
+            return { cheapest, nearest };
+        }
+
         // 결과 표시
         function displayResults(results, hours) {
             const parkingList = document.getElementById('parkingList');
@@ -1893,6 +2154,9 @@
                 displayParkingMarkers(results);
             }
 
+            // 추천 기준 정보 가져오기
+            const criteria = getRecommendationCriteria(results);
+
             let html = '';
             results.slice(0, 3).forEach((lot, index) => {
                 const typeClass = userMode.preferenceType || 'default';
@@ -1911,12 +2175,28 @@
                 const discountAmount = Math.round(originalCost) - lot.totalCost;
                 const discountText = discountAmount > 0 ? ` (${discountAmount.toLocaleString()}원 할인)` : '';
                 
+                // 한달 정기권 비교
+                const monthlyPassInfo = checkMonthlyPassRecommendation(lot, lot.totalCost);
+                
+                // 추천 기준 태그 생성
+                let criteriaTags = '';
+                if (index === 0) {
+                    criteriaTags += '<span class="criteria-tag optimal">최적</span>';
+                }
+                if (criteria.cheapest && criteria.cheapest.id === lot.id && index !== 0) {
+                    criteriaTags += '<span class="criteria-tag cheapest">최소비용</span>';
+                }
+                if (criteria.nearest && criteria.nearest.id === lot.id && index !== 0) {
+                    criteriaTags += '<span class="criteria-tag nearest">최단거리</span>';
+                }
+                
                 html += `
                     <div class="parking-card ${typeClass}">
                         <div class="parking-header">
                             <div class="parking-name">${index + 1}. ${lot.name}</div>
                             <div class="score-display">점수: ${lot.score.toFixed(1)}</div>
                         </div>
+                        ${criteriaTags ? `<div class="criteria-tags">${criteriaTags}</div>` : ''}
                         <div class="parking-details">
                             <div class="detail-item">
                                 <span class="detail-icon">💰</span>
@@ -1954,11 +2234,24 @@
                             </div>
                         </div>
                         ${getDiscountInfo(lot.appliedDiscounts)}
+                        ${monthlyPassInfo ? `
+                        <div class="monthly-pass-notice">
+                            <div class="monthly-pass-icon">🎫</div>
+                            <div class="monthly-pass-content">
+                                <div class="monthly-pass-title">${monthlyPassInfo.description || '한달 정기권'} 추천!</div>
+                                <div class="monthly-pass-details">
+                                    <span class="monthly-price">${monthlyPassInfo.monthlyPrice.toLocaleString()}원/월</span>
+                                    <span class="monthly-savings">(${monthlyPassInfo.savings.toLocaleString()}원 절약)</span>
+                                </div>
+                                <div class="monthly-pass-message">한달 정기권을 결제하면 더 저렴하게 이용 가능해요!</div>
+                            </div>
+                        </div>
+                        ` : ''}
                         <div style="font-size: 0.9rem; color: #666; margin: 8px 0;">
                             📍 ${lot.address}
                         </div>
                         <button class="navigate-btn" onclick="navigateToParking('${lot.name}')">
-                            🧭 길찾기
+                            🚗 자동차길찾기
                         </button>
                     </div>
                 `;
@@ -2011,7 +2304,7 @@
             }
         }
 
-        // 길찾기
+        // 길찾기 - 자동차로 현재 위치에서 추천 주차장까지
         function navigateToParking(name) {
             // 주차장 정보 찾기
             const parkingLot = parkingDatabase.find(lot => lot.name === name);
@@ -2020,22 +2313,31 @@
                 return;
             }
 
-            // 사용자 위치가 있으면 카카오맵 길찾기, 없으면 주소만 표시
-            if (currentUserLocation) {
-                // 카카오맵 길찾기 URL 생성
-                const startLat = currentUserLocation.lat;
-                const startLng = currentUserLocation.lng;
-                const endLat = parkingLot.lat;
-                const endLng = parkingLot.lng;
-                
-                const kakaoMapUrl = `https://map.kakao.com/link/to/${name},${endLat},${endLng}`;
-                window.open(kakaoMapUrl, '_blank');
-                
-                console.log(`${name}으로 길찾기를 시작합니다.`);
-            } else {
-                // 주소 정보만 표시
-                alert(`${name}\n📍 주소: ${parkingLot.address}\n\n위치 정보를 허용하면 길찾기가 가능합니다.`);
+            // 사용자 현재 위치가 있는지 확인
+            if (!currentUserLocation) {
+                alert('현재 위치 정보가 없습니다.\n📍 현재 위치 버튼을 눌러 위치를 확인해주세요.');
+                return;
             }
+
+            // 출발지(사용자 현재 위치)에서 목적지(주차장)까지 자동차 길찾기
+            const startLat = currentUserLocation.lat;
+            const startLng = currentUserLocation.lng;
+            const endLat = parkingLot.lat;
+            const endLng = parkingLot.lng;
+            
+            // 카카오맵 자동차 길찾기 URL 생성 (올바른 패턴 사용)
+            // 형식: /link/by/{이동수단}/출발지이름,위도,경도/도착지이름,위도,경도
+            const startLocation = `현재위치,${startLat},${startLng}`;
+            const endLocation = `${name},${endLat},${endLng}`;
+            const kakaoRouteUrl = `https://map.kakao.com/link/by/car/${startLocation}/${endLocation}`;
+            
+            // 새 탭에서 카카오맵 자동차 길찾기 열기
+            window.open(kakaoRouteUrl, '_blank');
+            
+            console.log(`🚗 현재 위치에서 ${name}까지 자동차 길찾기를 시작합니다.`);
+            console.log(`📍 출발지: ${startLocation}`);
+            console.log(`🏁 목적지: ${endLocation}`);
+            console.log(`🚙 이동수단: 자동차`);
         }
 
         // 음성 버튼 이벤트
@@ -2049,25 +2351,585 @@
             }
         });
 
+        // ========================================
+        // 카카오맵 마커 관련 함수들
+        // ========================================
+        
+        // 중복된 전역 변수 제거됨 (위에 이미 선언됨)
+        
+        // 기본 위치 (건국대학교 근처)
+        const baseLocation = {
+            lat: 37.5665,
+            lng: 127.0822
+        };
+        
+        // 카카오맵 초기화
+        function initializeKakaoMap() {
+            if (typeof kakao === 'undefined' || !kakao.maps) {
+                console.log('카카오맵 API가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+                return false;
+            }
+            
+            const mapContainer = document.getElementById('map');
+            const mapOption = {
+                center: new kakao.maps.LatLng(baseLocation.lat, baseLocation.lng),
+                level: 5
+            };
+            
+            map = new kakao.maps.Map(mapContainer, mapOption);
+            
+            // 줌 컨트롤 추가
+            const zoomControl = new kakao.maps.ZoomControl();
+            map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+            
+            // 지도 타입 컨트롤 추가
+            const mapTypeControl = new kakao.maps.MapTypeControl();
+            map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+            
+            // 초기 주차장 마커 표시
+            displayAllParkingMarkers();
+            
+            console.log('카카오맵이 초기화되었습니다.');
+            return true;
+        }
+        
+        // 현재 위치 가져오기
+        function getCurrentLocation() {
+            console.log('📍 위치 정보 요청 시작...');
+            
+            // 브라우저 환경 확인
+            const isHTTPS = location.protocol === 'https:';
+            const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+            const canUseGeolocation = isHTTPS || isLocalhost;
+            
+            console.log('🔒 프로토콜:', location.protocol);
+            console.log('🏠 호스트:', location.hostname);
+            console.log('✅ 위치정보 사용 가능:', canUseGeolocation);
+            
+            if (!navigator.geolocation) {
+                console.error('❌ 이 브라우저에서는 위치 정보를 지원하지 않습니다.');
+                document.getElementById('locationStatus').innerHTML = 
+                    '<div style="color: #ff5722; background: #ffebee; padding: 10px; border-radius: 6px;">' +
+                    '❌ 위치 정보를 지원하지 않는 브라우저입니다.<br>' +
+                    '<button onclick="useDefaultLocation()" style="margin-top: 8px; padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">' +
+                    '📍 광진구 중심으로 설정' +
+                    '</button>' +
+                    '</div>';
+                return;
+            }
+
+            // HTTP에서 위치 정보 차단될 수 있음을 미리 안내
+            if (!canUseGeolocation) {
+                console.warn('⚠️ HTTP 환경에서는 위치 정보가 제한됩니다.');
+                document.getElementById('locationStatus').innerHTML = 
+                    '<div style="color: #ff9800; background: #fff3e0; padding: 10px; border-radius: 6px;">' +
+                    '⚠️ HTTP 환경에서는 위치 정보가 제한될 수 있습니다.<br>' +
+                    '<small>브라우저 설정에서 위치 허용이 필요하거나 아래 버튼을 이용해주세요.</small><br>' +
+                    '<button onclick="tryGetLocationForced()" style="margin-top: 8px; margin-right: 5px; padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">' +
+                    '🔄 위치 권한 요청' +
+                    '</button>' +
+                    '<button onclick="useDefaultLocation()" style="padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">' +
+                    '📍 광진구 중심으로 설정' +
+                    '</button>' +
+                    '</div>';
+                return;
+            }
+            
+            tryGetLocationForced();
+        }
+        
+        // 강제로 위치 정보 요청 (HTTP 환경에서도 시도)
+        function tryGetLocationForced() {
+            const options = {
+                enableHighAccuracy: false, // 배터리 절약을 위해 false
+                timeout: 8000, // 8초로 단축
+                maximumAge: 30000 // 30초간 캐시
+            };
+
+            document.getElementById('locationStatus').innerHTML = 
+                '<div style="color: #2196F3; background: #e3f2fd; padding: 10px; border-radius: 6px;">' +
+                '📍 현재 위치를 가져오는 중...<br>' +
+                '<small>브라우저에서 위치 허용을 요청할 수 있습니다.</small>' +
+                '</div>';
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+                    
+                    console.log('✅ 위치 정보 획득 성공:', {
+                        latitude: lat,
+                        longitude: lng,
+                        accuracy: accuracy + 'm'
+                    });
+                    
+                    currentUserLocation = { lat, lng };
+
+                    if (map) {
+                        const userPosition = new kakao.maps.LatLng(lat, lng);
+                        map.setCenter(userPosition);
+                        map.setLevel(3);
+                        
+                        showUserLocationMarker(position);
+                        updateParkingMarkers();
+                    }
+                    
+                    document.getElementById('locationStatus').innerHTML = 
+                        '<div style="color: #4CAF50; background: #e8f5e8; padding: 10px; border-radius: 6px;">' +
+                        `✅ 현재 위치 업데이트 완료<br>` +
+                        `<small>정확도: ${Math.round(accuracy)}m | ${new Date().toLocaleTimeString()}</small>` +
+                        '</div>';
+                },
+                function(error) {
+                    let errorMessage = '';
+                    let troubleshoot = '';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = '위치 정보 접근이 거부되었습니다.';
+                            troubleshoot = '브라우저 설정에서 이 사이트의 위치 허용을 설정해주세요.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = '위치 정보를 사용할 수 없습니다.';
+                            troubleshoot = 'GPS가 꺼져있거나 신호가 약할 수 있습니다.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = '위치 정보 요청 시간이 초과되었습니다.';
+                            troubleshoot = '네트워크 연결을 확인해주세요.';
+                            break;
+                        default:
+                            errorMessage = '알 수 없는 오류가 발생했습니다.';
+                            troubleshoot = '브라우저를 새로고침해주세요.';
+                            break;
+                    }
+                    
+                    console.error('❌ 위치 정보 가져오기 실패:', {
+                        code: error.code,
+                        message: error.message
+                    });
+                    
+                    document.getElementById('locationStatus').innerHTML = 
+                        '<div style="color: #ff5722; background: #ffebee; padding: 10px; border-radius: 6px;">' +
+                        `<div style="font-weight: bold;">❌ ${errorMessage}</div>` +
+                        `<div style="font-size: 0.9rem; margin-top: 5px; color: #666;">${troubleshoot}</div>` +
+                        '<div style="margin-top: 8px;">' +
+                        '<button onclick="tryGetLocationForced()" style="margin-right: 5px; padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">' +
+                        '🔄 다시 시도' +
+                        '</button>' +
+                        '<button onclick="useDefaultLocation()" style="padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">' +
+                        '📍 광진구 중심으로 설정' +
+                        '</button>' +
+                        '</div>' +
+                        '</div>';
+                },
+                options
+            );
+        }
+        
+        // 기본 위치 사용 (위치 정보 실패 시 대안)
+        function useDefaultLocation() {
+            console.log('📍 기본 위치(광진구 중심) 사용');
+            
+            currentUserLocation = {
+                lat: 37.5442,
+                lng: 127.0778
+            };
+            
+            if (map) {
+                const defaultPosition = new kakao.maps.LatLng(currentUserLocation.lat, currentUserLocation.lng);
+                map.setCenter(defaultPosition);
+                map.setLevel(4);
+                
+                // 기본 위치 마커 표시
+                if (userMarker) {
+                    userMarker.setMap(null);
+                }
+                
+                const defaultMarkerImage = new kakao.maps.MarkerImage(
+                    'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+                        <circle cx="20" cy="20" r="18" fill="#ff9800" stroke="#ffffff" stroke-width="4"/>
+                        <circle cx="20" cy="20" r="8" fill="#ffffff"/>
+                    </svg>
+                    `),
+                    new kakao.maps.Size(40, 40),
+                    { offset: new kakao.maps.Point(20, 20) }
+                );
+                
+                userMarker = new kakao.maps.Marker({
+                    position: defaultPosition,
+                    image: defaultMarkerImage,
+                    title: '기본 위치 (광진구 중심)',
+                    zIndex: 1000
+                });
+                
+                userMarker.setMap(map);
+            }
+            
+            document.getElementById('locationStatus').innerHTML = 
+                '<div style="color: #ff9800; background: #fff3e0; padding: 10px; border-radius: 6px;">' +
+                '📍 광진구 중심으로 위치가 설정되었습니다.<br>' +
+                '<small>더 정확한 위치를 원하시면 "📍 현재 위치" 버튼을 다시 눌러주세요.</small>' +
+                '</div>';
+        }
+        
+        // 사용자 위치 마커 표시
+        function showUserLocationMarker(position) {
+            if (!map) return;
+            
+            // 기존 사용자 마커 제거
+            if (userMarker) {
+                userMarker.setMap(null);
+            }
+            
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const userPosition = new kakao.maps.LatLng(lat, lng);
+            
+            // 사용자 위치 마커 생성
+            const userMarkerImage = new kakao.maps.MarkerImage(
+                'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+                    <circle cx="20" cy="20" r="18" fill="#4285F4" stroke="#ffffff" stroke-width="4"/>
+                    <circle cx="20" cy="20" r="8" fill="#ffffff"/>
+                </svg>
+                `),
+                new kakao.maps.Size(40, 40),
+                { offset: new kakao.maps.Point(20, 20) }
+            );
+            
+            userMarker = new kakao.maps.Marker({
+                position: userPosition,
+                image: userMarkerImage,
+                title: '현재 위치',
+                zIndex: 1000
+            });
+            
+            userMarker.setMap(map);
+            
+            console.log('사용자 위치 마커가 표시되었습니다.');
+        }
+        
+        // 주차장 마커 표시 (검색 결과용)
+        function displayParkingMarkers(results) {
+            // 기존 주차장 마커 제거
+            clearParkingMarkers();
+            
+            if (!map || !results || results.length === 0) {
+                console.log('표시할 주차장이 없습니다.');
+                return;
+            }
+            
+            const userLat = currentUserLocation ? currentUserLocation.lat : baseLocation.lat;
+            const userLon = currentUserLocation ? currentUserLocation.lng : baseLocation.lng;
+            
+            const bounds = new kakao.maps.LatLngBounds();
+            
+            results.forEach((lot, index) => {
+                const position = new kakao.maps.LatLng(lot.lat, lot.lng);
+                const distance = calculateDistance(userLat, userLon, lot.lat, lot.lng);
+                
+                // 순위에 따른 마커 스타일
+                let markerColor = '#FF6B6B'; // 기본 빨간색 (4등 이하)
+                let markerText = '';
+                let markerImage;
+                
+                if (index < 3) {
+                    markerColor = '#007BFF'; // 파란색 (1,2,3등)
+                    markerText = (index + 1).toString();
+                    markerImage = createCustomMarker(markerColor, markerText, lot);
+                } else {
+                    markerImage = createDefaultParkingMarker(lot);
+                }
+                
+                const marker = new kakao.maps.Marker({
+                    position: position,
+                    image: markerImage,
+                    title: lot.name,
+                    zIndex: index < 3 ? 100 - index : 10 // 1,2,3등은 위에 표시
+                });
+                
+                marker.setMap(map);
+                parkingMarkers.push(marker);
+                
+                // 인포윈도우 내용
+                const infoContent = `
+                    <div style="padding: 10px; min-width: 200px; font-size: 12px;">
+                        <div style="font-weight: bold; margin-bottom: 5px; color: #333;">
+                            ${index + 1}. ${lot.name}
+                        </div>
+                        <div style="margin-bottom: 3px;">
+                            💰 <strong>${lot.totalCost.toLocaleString()}원</strong>
+                        </div>
+                        <div style="margin-bottom: 3px;">
+                            📍 ${distance.toFixed(2)}km
+                        </div>
+                        <div style="margin-bottom: 3px;">
+                            🅿️ ${lot.capacity || 'N/A'}대
+                        </div>
+                        <div style="margin-bottom: 3px;">
+                            🔌 ${lot.ev_charging ? '전기차충전 O' : '전기차충전 X'}
+                        </div>
+                        <div style="margin-bottom: 5px;">
+                            ⏰ ${lot.open_24h ? '24시간' : '시간제한'}
+                        </div>
+                        <div style="font-size: 10px; color: #666;">
+                            📍 ${lot.address}
+                        </div>
+                        <button onclick="navigateToParking('${lot.name}')" 
+                                style="margin-top: 5px; padding: 3px 8px; font-size: 10px; 
+                                       background: #007bff; color: white; border: none; 
+                                       border-radius: 3px; cursor: pointer;">
+                            🚗 자동차길찾기
+                        </button>
+                    </div>
+                `;
+                
+                const infowindow = new kakao.maps.InfoWindow({
+                    content: infoContent,
+                    removable: true,
+                    zIndex: 1000 // 인포윈도우는 항상 최상위
+                });
+                
+                // 마커 클릭 이벤트
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    closeAllInfoWindows();
+                    infowindow.open(map, marker);
+                });
+                
+                bounds.extend(position);
+            });
+            
+            // 지도 범위 조정
+            if (results.length > 1) {
+                map.setBounds(bounds);
+            } else if (results.length === 1) {
+                map.setCenter(results[0].position);
+                map.setLevel(3);
+            }
+            
+            console.log(`${results.length}개의 주차장 마커가 표시되었습니다.`);
+        }
+        
+        // 모든 주차장 마커 표시 (초기 화면용)
+        function displayAllParkingMarkers() {
+            clearParkingMarkers();
+            
+            if (!map) {
+                console.log('지도가 초기화되지 않았습니다.');
+                return;
+            }
+            
+            parkingDatabase.forEach((lot) => {
+                const position = new kakao.maps.LatLng(lot.lat, lot.lng);
+                const markerImage = createDefaultParkingMarker(lot);
+                
+                const marker = new kakao.maps.Marker({
+                    position: position,
+                    image: markerImage,
+                    title: lot.name,
+                    zIndex: 1 // 기본 마커는 낮은 순서
+                });
+                
+                marker.setMap(map);
+                parkingMarkers.push(marker);
+                
+                // 인포윈도우 (간단한 정보)
+                kakao.maps.event.addListener(marker, 'click', function() {
+                    closeAllInfoWindows();
+                    
+                    const infowindow = new kakao.maps.InfoWindow({
+                        content: `
+                            <div style="padding: 10px; min-width: 200px; font-size: 12px;">
+                                <h4 style="margin: 0 0 8px 0; color: #333;">${lot.name}</h4>
+                                <div style="font-size: 11px; color: #666; margin-bottom: 8px;">
+                                    💰 기본요금: ${lot.base_fare_30min || lot.price_per_hour}원
+                                </div>
+                                <div style="font-size: 11px; color: #888; margin-bottom: 8px;">
+                                    ⏰ ${lot.open_24h ? '24시간' : '시간제한'}
+                                    ${lot.ev_charging ? ' | ⚡ 전기차 충전 가능' : ''}
+                                </div>
+                                <div style="font-size: 10px; color: #666;">
+                                    📍 ${lot.address}
+                                </div>
+                                <button onclick="navigateToParking('${lot.name}')" 
+                                        style="margin-top: 5px; padding: 3px 8px; font-size: 10px; 
+                                               background: #007bff; color: white; border: none; 
+                                               border-radius: 3px; cursor: pointer;">
+                                    🚗 자동차길찾기
+                                </button>
+                            </div>
+                        `,
+                        removable: true,
+                        zIndex: 1000 // 인포윈도우는 항상 최상위
+                    });
+                    
+                    infowindow.open(map, marker);
+                });
+            });
+            
+            console.log(`${parkingDatabase.length}개의 주차장이 표시되었습니다.`);
+        }
+        
+        // 주차장 마커 제거
+        function clearParkingMarkers() {
+            parkingMarkers.forEach(marker => {
+                marker.setMap(null);
+            });
+            parkingMarkers = [];
+        }
+        
+        // 위치 변경 시 마커 업데이트
+        function updateParkingMarkers() {
+            if (window.lastSearchResults) {
+                displayParkingMarkers(window.lastSearchResults);
+            } else {
+                displayAllParkingMarkers();
+            }
+        }
+        
+        // 인포윈도우 모두 닫기
+        function closeAllInfoWindows() {
+            // 기존 인포윈도우들을 찾아서 닫기
+            if (window.currentInfoWindow) {
+                window.currentInfoWindow.close();
+            }
+        }
+        
+        // 커스텀 마커 생성 (순위 표시용 - 1,2,3등)
+        function createCustomMarker(color, text, lot) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 48; // 2px 감소
+            canvas.height = 48; // 2px 감소
+            
+            // 원 그리기
+            ctx.beginPath();
+            ctx.arc(24, 24, 20, 0, 2 * Math.PI); // 반지름 2px 감소
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            
+            // 순위 숫자
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 17px Arial'; // 1px 감소
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, 24, 24);
+            
+            // 전기차 충전 표시
+            if (lot.ev_charging) {
+                ctx.fillStyle = '#FFD700';
+                ctx.font = 'bold 18px Arial'; // 크기 증가
+                ctx.fillText('⚡', 38, 12);
+            }
+            
+            // 24시간 표시
+            if (lot.open_24h) {
+                ctx.fillStyle = '#00FF00';
+                ctx.font = 'bold 9px Arial'; // 1px 감소
+                ctx.fillText('24', 9, 38);
+            }
+            
+            const dataURL = canvas.toDataURL();
+            return new kakao.maps.MarkerImage(
+                dataURL,
+                new kakao.maps.Size(48, 48),
+                { offset: new kakao.maps.Point(24, 24) }
+            );
+        }
+        
+        // 기본 주차장 마커 생성
+        function createDefaultParkingMarker(lot) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 38; // 2px 감소
+            canvas.height = 38; // 2px 감소
+            
+            // 원 그리기
+            ctx.beginPath();
+            ctx.arc(19, 19, 16, 0, 2 * Math.PI); // 반지름 2px 감소
+            ctx.fillStyle = '#888888'; // 회색
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // P 문자
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 15px Arial'; // 1px 감소
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('P', 19, 19);
+            
+            // 전기차 충전 표시
+            if (lot.ev_charging) {
+                ctx.fillStyle = '#FFD700';
+                ctx.font = 'bold 16px Arial'; // 크기 증가
+                ctx.fillText('⚡', 32, 12);
+            }
+            
+            // 24시간 표시
+            if (lot.open_24h) {
+                ctx.fillStyle = '#00FF00';
+                ctx.font = 'bold 9px Arial'; // 1px 감소
+                ctx.fillText('24', 9, 38);
+            }
+            
+            const dataURL = canvas.toDataURL();
+            return new kakao.maps.MarkerImage(
+                dataURL,
+                new kakao.maps.Size(38, 38),
+                { offset: new kakao.maps.Point(19, 19) }
+            );
+        }
+
         // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
             updateUserInterface();
             updateSearchConditions();
             
-            // 카카오맵 초기화
-            if (typeof kakao !== 'undefined' && kakao.maps) {
-                initializeKakaoMap();
-            } else {
-    console.log('카카오맵 API 로딩 중...');
-    // API가 로드될 때까지 잠시 대기
-    setTimeout(() => {
-        if (typeof kakao !== 'undefined' && kakao.maps) {
-            initializeKakaoMap();
-        } else {
-            console.log('카카오맵 API 로딩 실패');
-        }
-    }, 1000);
-}
+            // 새로운 카카오맵 API 로딩 및 초기화
+            async function initializeApplication() {
+                try {
+                    console.log('🚀 SPARK 애플리케이션 초기화 시작...');
+                    
+                    // 1. 카카오맵 API 로드
+                    await loadKakaoMapAPI();
+                    console.log('✅ 카카오맵 API 로드 완료');
+                    
+                    // 2. 지도 초기화
+                    const mapResult = initializeKakaoMap();
+                    if (mapResult) {
+                        console.log('🗺️ 지도 초기화 성공!');
+                    } else {
+                        throw new Error('지도 초기화 실패');
+                    }
+                    
+                    // 3. 현재 위치 가져오기
+                    getCurrentLocation();
+                    
+                    console.log('🎉 SPARK 애플리케이션 초기화 완료!');
+                    
+                } catch (error) {
+                    console.error('❌ 애플리케이션 초기화 실패:', error);
+                    
+                    document.getElementById('locationStatus').innerHTML = 
+                        '<div style="color: #ff5722; background: #ffebee; padding: 10px; border-radius: 6px; margin: 10px 0;">' +
+                        '<div style="font-weight: bold;">❌ 지도 로딩 실패</div>' +
+                        '<div style="font-size: 0.9rem; margin-top: 5px;">네트워크 연결을 확인하고 다시 시도해주세요.</div>' +
+                        '<button onclick="location.reload()" style="margin-top: 8px; padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">' +
+                        '🔄 페이지 새로고침' +
+                        '</button>' +
+                        '</div>';
+                }
+            }
+            
+            // 애플리케이션 초기화 실행
+            initializeApplication();
             
             console.log('SPARK Final Algorithm Version 로드 완료');
         });

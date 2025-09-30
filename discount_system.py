@@ -445,3 +445,10 @@ if __name__ == "__main__":
     print(f"총 할인율: {((original_cost - final_cost) / original_cost) * 100:.1f}%")
 
 
+
+
+
+
+
+
+

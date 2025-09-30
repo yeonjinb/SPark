@@ -444,3 +444,10 @@ if __name__ == "__main__":
         print(f"  절약 금액: {result['savings_amount']:,}원")
 
 
+
+
+
+
+
+
+
